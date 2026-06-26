@@ -6,7 +6,8 @@ import '../../models/cooperative.dart';
 import '../../providers/data_provider.dart';
 
 class CooperativeFormScreen extends StatefulWidget {
-  final Cooperative? cooperative; // Si es null, estamos creando; si tiene valor, estamos editando
+  final Cooperative?
+      cooperative; // Si es null, estamos creando; si tiene valor, estamos editando
 
   const CooperativeFormScreen({super.key, this.cooperative});
 
@@ -73,7 +74,8 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
           _selectedRifPrefix = 'J';
         }
         // Los dígitos son todo después del primer guion: "12345678-9"
-        _rifDigitsController = TextEditingController(text: coop.id.substring(2));
+        _rifDigitsController =
+            TextEditingController(text: coop.id.substring(2));
       } else {
         _selectedRifPrefix = 'J';
         _rifDigitsController = TextEditingController(text: coop.id);
@@ -84,9 +86,9 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
 
       // Intentar encontrar el municipio en la lista de municipios disponibles
       _selectedMunicipio = _municipios.cast<String?>().firstWhere(
-        (m) => m == coop.location,
-        orElse: () => null,
-      );
+            (m) => m == coop.location,
+            orElse: () => null,
+          );
 
       // Parsear el horario existente con formato "HH:MM - HH:MM"
       _parseSchedule(coop.schedule);
@@ -274,7 +276,8 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // ─── SECCIÓN: Información de la Empresa ───
-                    _buildSectionTitle('Información de la Empresa', Icons.business_rounded),
+                    _buildSectionTitle(
+                        'Información de la Empresa', Icons.business_rounded),
                     const SizedBox(height: 12),
                     Card(
                       elevation: 0,
@@ -294,37 +297,52 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
                               children: [
                                 // Dropdown del prefijo RIF (J = Jurídica, V = Venezolano, etc.)
                                 SizedBox(
-                                  width: 90,
+                                  width: 100,
                                   child: DropdownButtonFormField<String>(
                                     value: _selectedRifPrefix,
                                     decoration: InputDecoration(
                                       labelText: 'Tipo',
-                                      labelStyle: const TextStyle(fontSize: 13),
-                                      prefixIcon: const Icon(Icons.badge_outlined, size: 20, color: Color(0xFF1A1F2B)),
+                                      labelStyle: const TextStyle(fontSize: 12),
+                                      prefixIcon: const Icon(
+                                          Icons.badge_outlined,
+                                          size: 20,
+                                          color: Color(0xFF1A1F2B)),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(color: Colors.grey.shade300),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey.shade300),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(color: Colors.grey.shade300),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey.shade300),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(color: Color(0xFF1A1F2B), width: 2),
+                                        borderSide: const BorderSide(
+                                            color: Color(0xFF1A1F2B), width: 2),
                                       ),
-                                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 14),
                                       filled: true,
-                                      fillColor: isEditing ? Colors.grey.shade100 : Colors.white,
+                                      fillColor: isEditing
+                                          ? Colors.grey.shade100
+                                          : Colors.white,
                                     ),
                                     // Deshabilitamos el selector si estamos editando (el RIF no cambia)
-                                    onChanged: isEditing ? null : (value) {
-                                      setState(() => _selectedRifPrefix = value!);
-                                    },
+                                    onChanged: isEditing
+                                        ? null
+                                        : (value) {
+                                            setState(() =>
+                                                _selectedRifPrefix = value!);
+                                          },
                                     items: _rifPrefixes.map((prefix) {
                                       return DropdownMenuItem(
                                         value: prefix,
-                                        child: Text(prefix, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                        child: Text(prefix,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold)),
                                       );
                                     }).toList(),
                                   ),
@@ -334,37 +352,47 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
                                 Expanded(
                                   child: TextFormField(
                                     controller: _rifDigitsController,
-                                    enabled: !isEditing, // No se puede cambiar el RIF al editar
+                                    enabled:
+                                        !isEditing, // No se puede cambiar el RIF al editar
                                     keyboardType: TextInputType.text,
                                     inputFormatters: [
                                       // Permitir solo dígitos y guion
-                                      FilteringTextInputFormatter.allow(RegExp(r'[\d-]')),
+                                      FilteringTextInputFormatter.allow(
+                                          RegExp(r'[\d-]')),
                                     ],
                                     decoration: InputDecoration(
                                       labelText: 'Número RIF (12345678-9)',
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(color: Colors.grey.shade300),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey.shade300),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(color: Colors.grey.shade300),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey.shade300),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(color: Color(0xFF1A1F2B), width: 2),
+                                        borderSide: const BorderSide(
+                                            color: Color(0xFF1A1F2B), width: 2),
                                       ),
                                       disabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(color: Colors.grey.shade200),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey.shade200),
                                       ),
                                       filled: true,
-                                      fillColor: isEditing ? Colors.grey.shade100 : Colors.white,
+                                      fillColor: isEditing
+                                          ? Colors.grey.shade100
+                                          : Colors.white,
                                     ),
                                     validator: (v) {
-                                      if (v == null || v.trim().isEmpty) return 'Campo requerido';
+                                      if (v == null || v.trim().isEmpty)
+                                        return 'Campo requerido';
                                       // Validar formato de dígitos: 8 números, guion, 1 número
-                                      if (!RegExp(r'^\d{8}-\d$').hasMatch(v.trim())) {
+                                      if (!RegExp(r'^\d{8}-\d$')
+                                          .hasMatch(v.trim())) {
                                         return 'Formato: 12345678-9';
                                       }
                                       return null;
@@ -380,7 +408,8 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
                               controller: _nameController,
                               label: 'Nombre de la Cooperativa',
                               icon: Icons.business,
-                              validator: (v) => v?.isEmpty ?? true ? 'Campo requerido' : null,
+                              validator: (v) =>
+                                  v?.isEmpty ?? true ? 'Campo requerido' : null,
                             ),
                             const SizedBox(height: 16),
 
@@ -391,18 +420,24 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
                               isExpanded: true,
                               decoration: InputDecoration(
                                 labelText: 'Municipio / Ubicación',
-                                prefixIcon: const Icon(Icons.location_on_outlined, size: 22, color: Color(0xFF1A1F2B)),
+                                prefixIcon: const Icon(
+                                    Icons.location_on_outlined,
+                                    size: 22,
+                                    color: Color(0xFF1A1F2B)),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(color: Colors.grey.shade300),
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade300),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(color: Colors.grey.shade300),
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade300),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: Color(0xFF1A1F2B), width: 2),
+                                  borderSide: const BorderSide(
+                                      color: Color(0xFF1A1F2B), width: 2),
                                 ),
                                 filled: true,
                                 fillColor: Colors.white,
@@ -411,7 +446,8 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
                               onChanged: (value) {
                                 setState(() => _selectedMunicipio = value);
                               },
-                              validator: (v) => v == null ? 'Seleccione un municipio' : null,
+                              validator: (v) =>
+                                  v == null ? 'Seleccione un municipio' : null,
                               items: _municipios.map((municipio) {
                                 return DropdownMenuItem(
                                   value: municipio,
@@ -437,14 +473,21 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
                                     child: InputDecorator(
                                       decoration: InputDecoration(
                                         labelText: 'Hora Inicio',
-                                        prefixIcon: const Icon(Icons.access_time, size: 22, color: Color(0xFF1A1F2B)),
+                                        prefixIcon: const Icon(
+                                            Icons.access_time,
+                                            size: 22,
+                                            color: Color(0xFF1A1F2B)),
                                         border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                          borderSide: BorderSide(color: Colors.grey.shade300),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey.shade300),
                                         ),
                                         enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                          borderSide: BorderSide(color: Colors.grey.shade300),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey.shade300),
                                         ),
                                         filled: true,
                                         fillColor: Colors.white,
@@ -472,14 +515,21 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
                                     child: InputDecorator(
                                       decoration: InputDecoration(
                                         labelText: 'Hora Fin',
-                                        prefixIcon: const Icon(Icons.access_time, size: 22, color: Color(0xFF1A1F2B)),
+                                        prefixIcon: const Icon(
+                                            Icons.access_time,
+                                            size: 22,
+                                            color: Color(0xFF1A1F2B)),
                                         border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                          borderSide: BorderSide(color: Colors.grey.shade300),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey.shade300),
                                         ),
                                         enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                          borderSide: BorderSide(color: Colors.grey.shade300),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey.shade300),
                                         ),
                                         filled: true,
                                         fillColor: Colors.white,
@@ -530,10 +580,17 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
                         elevation: 2,
                       ),
                       child: _isLoading
-                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white))
                           : Text(
-                              isEditing ? 'Guardar Cambios' : 'Crear Cooperativa',
-                              style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+                              isEditing
+                                  ? 'Guardar Cambios'
+                                  : 'Crear Cooperativa',
+                              style: GoogleFonts.poppins(
+                                  fontSize: 16, fontWeight: FontWeight.w600),
                             ),
                     ),
                   ],

@@ -34,7 +34,8 @@ class _DriverFormScreenState extends State<DriverFormScreen> {
     super.initState();
     _cedulaController = TextEditingController(text: widget.driver?.id ?? '');
     _nameController = TextEditingController(text: widget.driver?.name ?? '');
-    _lastNameController = TextEditingController(text: widget.driver?.lastName ?? '');
+    _lastNameController =
+        TextEditingController(text: widget.driver?.lastName ?? '');
     _emailController = TextEditingController(text: widget.driver?.email ?? '');
     _phoneController = TextEditingController(text: widget.driver?.phone ?? '');
     _ageController = TextEditingController(
@@ -128,7 +129,8 @@ class _DriverFormScreenState extends State<DriverFormScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildSectionTitle('Información del Chofer', Icons.person_outline),
+                    _buildSectionTitle(
+                        'Información del Chofer', Icons.person_outline),
                     const SizedBox(height: 12),
                     Card(
                       elevation: 0,
@@ -145,21 +147,24 @@ class _DriverFormScreenState extends State<DriverFormScreen> {
                               label: 'Cédula de identidad',
                               icon: Icons.badge_outlined,
                               enabled: !isEditing,
-                              validator: (v) => v?.isEmpty ?? true ? 'Campo requerido' : null,
+                              validator: (v) =>
+                                  v?.isEmpty ?? true ? 'Campo requerido' : null,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
                               controller: _nameController,
                               label: 'Nombre',
                               icon: Icons.person,
-                              validator: (v) => v?.isEmpty ?? true ? 'Campo requerido' : null,
+                              validator: (v) =>
+                                  v?.isEmpty ?? true ? 'Campo requerido' : null,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
                               controller: _lastNameController,
                               label: 'Apellido',
                               icon: Icons.person_outline,
-                              validator: (v) => v?.isEmpty ?? true ? 'Campo requerido' : null,
+                              validator: (v) =>
+                                  v?.isEmpty ?? true ? 'Campo requerido' : null,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
@@ -168,7 +173,8 @@ class _DriverFormScreenState extends State<DriverFormScreen> {
                               icon: Icons.email,
                               keyboardType: TextInputType.emailAddress,
                               validator: (v) {
-                                if (v == null || v.isEmpty) return 'Campo requerido';
+                                if (v == null || v.isEmpty)
+                                  return 'Campo requerido';
                                 if (!v.contains('@')) return 'Email inválido';
                                 return null;
                               },
@@ -179,8 +185,21 @@ class _DriverFormScreenState extends State<DriverFormScreen> {
                               label: 'Número de teléfono',
                               icon: Icons.phone,
                               keyboardType: TextInputType.phone,
-                              formatters: [FilteringTextInputFormatter.digitsOnly],
-                              validator: (v) => v?.isEmpty ?? true ? 'Campo requerido' : null,
+                              formatters: [
+                                FilteringTextInputFormatter
+                                    .digitsOnly, // Solo permite dígitos
+                                LengthLimitingTextInputFormatter(
+                                    11), // Limita a 11 caracteres
+                              ],
+                              validator: (v) {
+                                if (v == null || v.isEmpty) {
+                                  return 'Campo requerido';
+                                }
+                                if (v.length != 11) {
+                                  return 'Debe tener exactamente 11 dígitos';
+                                }
+                                return null; // Válido
+                              },
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
@@ -188,11 +207,15 @@ class _DriverFormScreenState extends State<DriverFormScreen> {
                               label: 'Edad',
                               icon: Icons.cake,
                               keyboardType: TextInputType.number,
-                              formatters: [FilteringTextInputFormatter.digitsOnly],
+                              formatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
                               validator: (v) {
-                                if (v == null || v.isEmpty) return 'Campo requerido';
+                                if (v == null || v.isEmpty)
+                                  return 'Campo requerido';
                                 final age = int.tryParse(v);
-                                if (age == null || age <= 0) return 'Edad inválida';
+                                if (age == null || age <= 0)
+                                  return 'Edad inválida';
                                 return null;
                               },
                             ),
@@ -220,7 +243,9 @@ class _DriverFormScreenState extends State<DriverFormScreen> {
                                   strokeWidth: 2, color: Colors.white),
                             )
                           : Text(
-                              isEditing ? 'Guardar Cambios' : 'Registrar Chofer',
+                              isEditing
+                                  ? 'Guardar Cambios'
+                                  : 'Registrar Chofer',
                               style: GoogleFonts.poppins(
                                   fontSize: 16, fontWeight: FontWeight.w600),
                             ),
