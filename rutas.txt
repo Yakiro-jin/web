@@ -1,0 +1,53 @@
+Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RoutesResolver] AppController {/}: +8ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/, GET} route +14ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RoutesResolver] RutasController {/rutas}: +1ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/rutas/destino/crear, POST} route +3ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/rutas/destino/obtener, GET} route +2ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/rutas/destino/filter, POST} route +2ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/rutas/destino/eliminar, POST} route +1ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/rutas/destino/actualizar, PATCH} route +2ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RoutesResolver] CoperativaController {/cooperativa}: +1ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/cooperativa/cooperativas/crear, POST} route +2ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/cooperativa/cooperativas/todas, GET} route +1ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/cooperativa/cooperativas/filter, POST} route +2ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/cooperativa/cooperativas/eliminar, DELETE} route +2ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/cooperativa/cooperativas/actualizar, PATCH} route +2ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RoutesResolver] VehiculosController {/vehiculos}: +0ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/vehiculos/vehiculo/registrar, POST} route +1ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/vehiculos/vehiculo/todos, GET} route +1ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/vehiculos/vehiculo/filter, GET} route +1ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/vehiculos/vehiculo/eliminar, DELETE} route +1ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/vehiculos/vehiculo/actualizar/:placa, PATCH} route +4ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RoutesResolver] PuntosControlController {/puntos-control}: +1ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/puntos-control/punto-controles/crear, POST} route +1ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/puntos-control/punto-controles/todas, GET} route +1ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/puntos-control/punto-controles/filter/:nombre, GET} route +1ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/puntos-control/punto-controles/eliminar/:nombre, DELETE} route +1ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RouterExplorer] Mapped {/puntos-control/punto-controles/actualizar, PATCH} route +1ms
+
+[Nest] 1  - 06/15/2026, 1:10:17 AM     LOG [RoutesResolver] ViajesController {/viajes}: +1ms

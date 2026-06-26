@@ -1,0 +1,42 @@
+[
+  {
+    "cedula": "12345678",
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "email": "juan@email.com",
+    "telefono": "04141234567",
+    "edad": 30
+  },
+  {
+    "cedula": "87654321",
+    "nombre": "María",
+    "apellido": "González",
+    "email": "maria@email.com",
+    "telefono": "04241234567",
+    "edad": 28
+  },
+  {
+    "cedula": "11223344",
+    "nombre": "Carlos",
+    "apellido": "Rodríguez",
+    "email": "carlos@email.com",
+    "telefono": "04121234567",
+    "edad": 35
+  },
+  {
+    "cedula": "44332211",
+    "nombre": "Ana",
+    "apellido": "López",
+    "email": "ana@email.com",
+    "telefono": "04261234567",
+    "edad": 40
+  },
+  {
+    "cedula": "55667788",
+    "nombre": "Luis",
+    "apellido": "Martínez",
+    "email": "luis@email.com",
+    "telefono": "04161234567",
+    "edad": 32
+  }
+]

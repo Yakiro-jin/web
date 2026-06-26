@@ -1,0 +1,54 @@
+[
+  {
+    "numero_ruta": "RUT-001",
+    "nombre": "Caracas Centro",
+    "descripcion": "Ruta por el centro de Caracas",
+    "tarifa": 50,
+    "cooperativa": {
+      "rif_cooperativa": "J-12345678-9",
+      "nombre": "Transporte Rápido CA",
+      "ubicacion": "Caracas",
+      "descripcion": "Cooperativa de transporte urbano",
+      "horario": "05:00-22:00"
+    }
+  },
+  {
+    "numero_ruta": "RUT-002",
+    "nombre": "Caracas Este",
+    "descripcion": "Ruta hacia el este de Caracas",
+    "tarifa": 60,
+    "cooperativa": {
+      "rif_cooperativa": "J-12345678-9",
+      "nombre": "Transporte Rápido CA",
+      "ubicacion": "Caracas",
+      "descripcion": "Cooperativa de transporte urbano",
+      "horario": "05:00-22:00"
+    }
+  },
+  {
+    "numero_ruta": "RUT-003",
+    "nombre": "Maracaibo Norte",
+    "descripcion": "Ruta norte de Maracaibo",
+    "tarifa": 40,
+    "cooperativa": {
+      "rif_cooperativa": "J-87654321-0",
+      "nombre": "TransCaribe CA",
+      "ubicacion": "Maracaibo",
+      "descripcion": "Transporte interurbano",
+      "horario": "06:00-23:00"
+    }
+  },
+  {
+    "numero_ruta": "RUT-004",
+    "nombre": "Caracas Sur",
+    "descripcion": "Ruta hacia el sur de Caracas",
+    "tarifa": 70,
+    "cooperativa": {
+      "rif_cooperativa": "J-12345678-9",
+      "nombre": "Transporte Rápido CA",
+      "ubicacion": "Caracas",
+      "descripcion": "Cooperativa de transporte urbano",
+      "horario": "05:00-22:00"
+    }
+  }
+]

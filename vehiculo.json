@@ -1,0 +1,80 @@
+[
+  {
+    "placa": "ABC-1234",
+    "modelo": "Toyota HiAce",
+    "color": "Blanco",
+    "anofabricacion": "2020-01-15T00:00:00.000Z",
+    "cooperativa": {
+      "rif_cooperativa": "J-12345678-9",
+      "nombre": "Transporte Rápido CA",
+      "ubicacion": "Caracas",
+      "descripcion": "Cooperativa de transporte urbano",
+      "horario": "05:00-22:00"
+    }
+  },
+  {
+    "placa": "XYZ-5678",
+    "modelo": "Nissan Urvan",
+    "color": "Azul",
+    "anofabricacion": "2019-05-20T00:00:00.000Z",
+    "cooperativa": {
+      "rif_cooperativa": "J-87654321-0",
+      "nombre": "TransCaribe CA",
+      "ubicacion": "Maracaibo",
+      "descripcion": "Transporte interurbano",
+      "horario": "06:00-23:00"
+    }
+  },
+  {
+    "placa": "DEF-9012",
+    "modelo": "Mercedes Sprinter",
+    "color": "Plateado",
+    "anofabricacion": "2021-03-10T00:00:00.000Z",
+    "cooperativa": {
+      "rif_cooperativa": "J-11223344-5",
+      "nombre": "MetroBus CA",
+      "ubicacion": "Valencia",
+      "descripcion": "Rutas metropolitanas",
+      "horario": "04:30-22:30"
+    }
+  },
+  {
+    "placa": "GHI-3456",
+    "modelo": "Ford Transit",
+    "color": "Rojo",
+    "anofabricacion": "2018-11-30T00:00:00.000Z",
+    "cooperativa": {
+      "rif_cooperativa": "J-99887766-3",
+      "nombre": "Transporte Seguro",
+      "ubicacion": "Barquisimeto",
+      "descripcion": "Servicios de transporte seguro",
+      "horario": "05:30-23:30"
+    }
+  },
+  {
+    "placa": "JKL-7890",
+    "modelo": "Toyota Coaster",
+    "color": "Verde",
+    "anofabricacion": "2022-02-25T00:00:00.000Z",
+    "cooperativa": {
+      "rif_cooperativa": "J-12345678-9",
+      "nombre": "Transporte Rápido CA",
+      "ubicacion": "Caracas",
+      "descripcion": "Cooperativa de transporte urbano",
+      "horario": "05:00-22:00"
+    }
+  },
+  {
+    "placa": "AADDFFD",
+    "modelo": "Encava",
+    "color": "Rojo",
+    "anofabricacion": "2000-11-23T00:00:00.000Z",
+    "cooperativa": {
+      "rif_cooperativa": "J-12345678-9",
+      "nombre": "Transporte Rápido CA",
+      "ubicacion": "Caracas",
+      "descripcion": "Cooperativa de transporte urbano",
+      "horario": "05:00-22:00"
+    }
+  }
+]
