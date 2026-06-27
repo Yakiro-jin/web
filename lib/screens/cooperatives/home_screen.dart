@@ -24,7 +24,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   TabController? _tabController;
   String? _selectedCooperativeId;
   String? _selectedFilterRouteId;
@@ -33,13 +34,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    // TabController is initialized in didChangeDependencies or build when cooperatives count is known
   }
 
   void _initTabController() {
     if (_tabController == null) {
       _tabController = TabController(length: 5, vsync: this);
       _tabController!.addListener(() {
+        if (!mounted) return;
         if (_tabController!.index != _activeTabIndex) {
           setState(() {
             _activeTabIndex = _tabController!.index;
@@ -55,7 +56,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     super.dispose();
   }
 
-  void _showDeleteCooperativeDialog(BuildContext context, Cooperative cooperative) {
+  void _showDeleteCooperativeDialog(
+      BuildContext context, Cooperative cooperative) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -86,7 +88,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  void _showCooperativeSelectionDialog(BuildContext context, DataProvider dataProvider) {
+  void _showCooperativeSelectionDialog(
+      BuildContext context, DataProvider dataProvider) {
     final cooperatives = dataProvider.cooperatives;
 
     showDialog(
@@ -95,9 +98,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         return AlertDialog(
           title: Text(
             'Seleccionar Cooperativa',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
+            style:
+                GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           content: SizedBox(
             width: double.maxFinite,
             child: ListView.builder(
@@ -109,19 +114,26 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
                 return ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: isSelected ? Colors.green.shade100 : Colors.grey.shade100,
+                    backgroundColor: isSelected
+                        ? Colors.green.shade100
+                        : Colors.grey.shade100,
                     child: Icon(
                       Icons.business,
-                      color: isSelected ? Colors.green.shade800 : Colors.grey.shade700,
+                      color: isSelected
+                          ? Colors.green.shade800
+                          : Colors.grey.shade700,
                     ),
                   ),
                   title: Text(
                     coop.name,
                     style: GoogleFonts.poppins(
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
-                  trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.green) : null,
+                  trailing: isSelected
+                      ? const Icon(Icons.check_circle, color: Colors.green)
+                      : null,
                   onTap: () {
                     setState(() {
                       _selectedCooperativeId = coop.id;
@@ -144,11 +156,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  void _showDeleteDriverDialog(BuildContext context, String driverId, String driverName) {
+  void _showDeleteDriverDialog(
+      BuildContext context, String driverId, String driverName) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Confirmar eliminación', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        title: Text('Confirmar eliminación',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
         content: Text(
             '¿Está seguro de eliminar al chofer "$driverName"? Se desasignará de cualquier unidad.'),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -189,7 +203,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             appBar: AppBar(
               title: Text(
                 'Panel de Control',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 18),
+                style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600, fontSize: 18),
               ),
               elevation: 0,
               backgroundColor: const Color(0xFF1A1F2B),
@@ -292,11 +307,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1A1F2B),
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                       icon: const Icon(Icons.add_business_rounded),
-                      label: Text('Crear Cooperativa', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                      label: Text('Crear Cooperativa',
+                          style:
+                              GoogleFonts.poppins(fontWeight: FontWeight.w600)),
                     ),
                   ],
                 ),
@@ -305,10 +324,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           );
         }
 
-        // Handle selected cooperative
         _selectedCooperativeId ??= cooperatives.first.id;
 
-        final matching = cooperatives.where((c) => c.id == _selectedCooperativeId);
+        final matching =
+            cooperatives.where((c) => c.id == _selectedCooperativeId);
         Cooperative activeCooperative;
         if (matching.isNotEmpty) {
           activeCooperative = matching.first;
@@ -327,7 +346,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             appBar: AppBar(
               title: Row(
                 children: [
-                  const Icon(Icons.directions_bus, color: Colors.white, size: 28),
+                  const Icon(Icons.directions_bus,
+                      color: Colors.white, size: 28),
                   const SizedBox(width: 12),
                   Text(
                     'Panel Administrativo - ${activeCooperative.name}',
@@ -340,9 +360,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               foregroundColor: Colors.white,
               actions: [
                 TextButton.icon(
-                  onPressed: () => _showCooperativeSelectionDialog(context, dataProvider),
-                  icon: const Icon(Icons.swap_horiz_rounded, color: Colors.white),
-                  label: Text('Cambiar Cooperativa', style: GoogleFonts.poppins(color: Colors.white)),
+                  onPressed: () =>
+                      _showCooperativeSelectionDialog(context, dataProvider),
+                  icon:
+                      const Icon(Icons.swap_horiz_rounded, color: Colors.white),
+                  label: Text('Cambiar Cooperativa',
+                      style: GoogleFonts.poppins(color: Colors.white)),
                 ),
                 TextButton.icon(
                   onPressed: () async {
@@ -358,19 +381,23 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       });
                     }
                   },
-                  icon: const Icon(Icons.add_business_rounded, color: Colors.white),
-                  label: Text('Nueva Cooperativa', style: GoogleFonts.poppins(color: Colors.white)),
+                  icon: const Icon(Icons.add_business_rounded,
+                      color: Colors.white),
+                  label: Text('Nueva Cooperativa',
+                      style: GoogleFonts.poppins(color: Colors.white)),
                 ),
                 TextButton.icon(
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => CooperativeFormScreen(cooperative: activeCooperative),
+                        builder: (context) => CooperativeFormScreen(
+                            cooperative: activeCooperative),
                       ),
                     );
                   },
                   icon: const Icon(Icons.edit_rounded, color: Colors.white),
-                  label: Text('Editar Actual', style: GoogleFonts.poppins(color: Colors.white)),
+                  label: Text('Editar Actual',
+                      style: GoogleFonts.poppins(color: Colors.white)),
                 ),
                 IconButton(
                   icon: const Icon(Icons.logout_rounded),
@@ -392,9 +419,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   },
                   labelType: NavigationRailLabelType.all,
                   backgroundColor: const Color(0xFF1A1F2B),
-                  unselectedLabelTextStyle: GoogleFonts.poppins(color: Colors.grey.shade400, fontSize: 12),
-                  selectedLabelTextStyle: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
-                  unselectedIconTheme: IconThemeData(color: Colors.grey.shade400),
+                  unselectedLabelTextStyle: GoogleFonts.poppins(
+                      color: Colors.grey.shade400, fontSize: 12),
+                  selectedLabelTextStyle: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12),
+                  unselectedIconTheme:
+                      IconThemeData(color: Colors.grey.shade400),
                   selectedIconTheme: const IconThemeData(color: Colors.white),
                   destinations: const [
                     NavigationRailDestination(
@@ -472,7 +504,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   } else if (value == 'edit') {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => CooperativeFormScreen(cooperative: activeCooperative),
+                        builder: (context) => CooperativeFormScreen(
+                            cooperative: activeCooperative),
                       ),
                     );
                   } else if (value == 'delete') {
@@ -518,7 +551,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       children: [
                         Icon(Icons.delete_rounded, color: Colors.red),
                         SizedBox(width: 8),
-                        Text('Eliminar cooperativa actual', style: TextStyle(color: Colors.red)),
+                        Text('Eliminar cooperativa actual',
+                            style: TextStyle(color: Colors.red)),
                       ],
                     ),
                   ),
@@ -582,12 +616,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 color: Colors.green.shade50,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.route_outlined, size: 64, color: Colors.green.shade300),
+              child: Icon(Icons.route_outlined,
+                  size: 64, color: Colors.green.shade300),
             ),
             const SizedBox(height: 24),
-            Text('No hay rutas registradas', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+            Text('No hay rutas registradas',
+                style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade700)),
             const SizedBox(height: 8),
-            Text('Comienza agregando una nueva ruta', style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey.shade500)),
+            Text('Comienza agregando una nueva ruta',
+                style: GoogleFonts.poppins(
+                    fontSize: 14, color: Colors.grey.shade500)),
           ],
         ),
       );
@@ -664,20 +705,30 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 color: Colors.orange.shade50,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.directions_bus_outlined, size: 64, color: Colors.orange.shade300),
+              child: Icon(Icons.directions_bus_outlined,
+                  size: 64, color: Colors.orange.shade300),
             ),
             const SizedBox(height: 24),
-            Text('No hay buses registrados', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+            Text('No hay buses registrados',
+                style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade700)),
             const SizedBox(height: 8),
-            Text('Registra un bus y asígnale un chofer', style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey.shade500)),
+            Text('Registra un bus y asígnale un chofer',
+                style: GoogleFonts.poppins(
+                    fontSize: 14, color: Colors.grey.shade500)),
           ],
         ),
       );
     }
 
     Widget buildUnitCard(dynamic unit) {
-      final matchingDrivers = dataProvider.drivers.where((d) => d.id == unit.driverId);
-      final driverName = matchingDrivers.isNotEmpty ? '${matchingDrivers.first.name} ${matchingDrivers.first.lastName}' : null;
+      final matchingDrivers =
+          dataProvider.drivers.where((d) => d.id == unit.driverId);
+      final driverName = matchingDrivers.isNotEmpty
+          ? '${matchingDrivers.first.name} ${matchingDrivers.first.lastName}'
+          : null;
       return TransportUnitCard(
         unit: unit,
         driverName: driverName,
@@ -734,12 +785,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 color: Colors.blue.shade50,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.people_outline_rounded, size: 64, color: Colors.blue.shade300),
+              child: Icon(Icons.people_outline_rounded,
+                  size: 64, color: Colors.blue.shade300),
             ),
             const SizedBox(height: 24),
-            Text('No hay choferes registrados', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+            Text('No hay choferes registrados',
+                style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade700)),
             const SizedBox(height: 8),
-            Text('Registra los choferes de la cooperativa aquí', style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey.shade500)),
+            Text('Registra los choferes de la cooperativa aquí',
+                style: GoogleFonts.poppins(
+                    fontSize: 14, color: Colors.grey.shade500)),
           ],
         ),
       );
@@ -750,7 +808,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           leading: CircleAvatar(
             backgroundColor: Colors.blue.shade100,
             radius: 24,
@@ -758,7 +817,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ),
           title: Text(
             '${driver.name} ${driver.lastName}',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16),
+            style:
+                GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 4.0),
@@ -772,9 +832,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.badge_outlined, size: 14, color: Colors.grey),
+                        const Icon(Icons.badge_outlined,
+                            size: 14, color: Colors.grey),
                         const SizedBox(width: 4),
-                        Flexible(child: Text('C.I. ${driver.id}', overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.grey.shade600))),
+                        Flexible(
+                            child: Text('C.I. ${driver.id}',
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: Colors.grey.shade600))),
                       ],
                     ),
                     Row(
@@ -782,7 +846,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       children: [
                         const Icon(Icons.phone, size: 14, color: Colors.grey),
                         const SizedBox(width: 4),
-                        Flexible(child: Text(driver.phone, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.grey.shade600))),
+                        Flexible(
+                            child: Text(driver.phone,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: Colors.grey.shade600))),
                       ],
                     ),
                   ],
@@ -795,17 +862,25 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.email_outlined, size: 14, color: Colors.grey),
+                        const Icon(Icons.email_outlined,
+                            size: 14, color: Colors.grey),
                         const SizedBox(width: 4),
-                        Flexible(child: Text(driver.email, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.grey.shade600))),
+                        Flexible(
+                            child: Text(driver.email,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: Colors.grey.shade600))),
                       ],
                     ),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.cake_outlined, size: 14, color: Colors.grey),
+                        const Icon(Icons.cake_outlined,
+                            size: 14, color: Colors.grey),
                         const SizedBox(width: 4),
-                        Flexible(child: Text('${driver.age} años', overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.grey.shade600))),
+                        Flexible(
+                            child: Text('${driver.age} años',
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: Colors.grey.shade600))),
                       ],
                     ),
                   ],
@@ -825,7 +900,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   ),
                 );
               } else if (value == 'delete') {
-                _showDeleteDriverDialog(context, driver.id, '${driver.name} ${driver.lastName}');
+                _showDeleteDriverDialog(
+                    context, driver.id, '${driver.name} ${driver.lastName}');
               }
             },
             itemBuilder: (context) => [
@@ -895,12 +971,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 color: Colors.teal.shade50,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.people_outline_rounded, size: 64, color: Colors.teal.shade300),
+              child: Icon(Icons.people_outline_rounded,
+                  size: 64, color: Colors.teal.shade300),
             ),
             const SizedBox(height: 24),
-            Text('No hay usuarios registrados', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+            Text('No hay usuarios registrados',
+                style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade700)),
             const SizedBox(height: 8),
-            Text('Comienza agregando un nuevo usuario', style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey.shade500)),
+            Text('Comienza agregando un nuevo usuario',
+                style: GoogleFonts.poppins(
+                    fontSize: 14, color: Colors.grey.shade500)),
           ],
         ),
       );
@@ -911,7 +994,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           leading: CircleAvatar(
             backgroundColor: Colors.teal.shade100,
             radius: 24,
@@ -919,7 +1003,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ),
           title: Text(
             '${user.nombre} ${user.apellido}',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16),
+            style:
+                GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 4.0),
@@ -928,21 +1013,29 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.badge_outlined, size: 14, color: Colors.grey),
+                    const Icon(Icons.badge_outlined,
+                        size: 14, color: Colors.grey),
                     const SizedBox(width: 4),
-                    Text('C.I. ${user.cedula}', style: TextStyle(color: Colors.grey.shade600)),
+                    Text('C.I. ${user.cedula}',
+                        style: TextStyle(color: Colors.grey.shade600)),
                     const SizedBox(width: 12),
-                    const Icon(Icons.admin_panel_settings_outlined, size: 14, color: Colors.grey),
+                    const Icon(Icons.admin_panel_settings_outlined,
+                        size: 14, color: Colors.grey),
                     const SizedBox(width: 4),
-                    Text(user.rol, style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.bold)),
+                    Text(user.rol,
+                        style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.bold)),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.email_outlined, size: 14, color: Colors.grey),
+                    const Icon(Icons.email_outlined,
+                        size: 14, color: Colors.grey),
                     const SizedBox(width: 4),
-                    Text(user.correo, style: TextStyle(color: Colors.grey.shade600)),
+                    Text(user.correo,
+                        style: TextStyle(color: Colors.grey.shade600)),
                   ],
                 ),
               ],
@@ -1018,8 +1111,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Confirmar eliminación', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-        content: Text('¿Está seguro de eliminar al usuario "${user.nombre} ${user.apellido}"?'),
+        title: Text('Confirmar eliminación',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        content: Text(
+            '¿Está seguro de eliminar al usuario "${user.nombre} ${user.apellido}"?'),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         actions: [
           TextButton(
@@ -1048,7 +1143,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   Widget? _buildFAB(Cooperative cooperative) {
     if (_activeTabIndex == 0) {
-      // Dashboard tab - no FAB
       return null;
     } else if (_activeTabIndex == 1) {
       return FloatingActionButton.extended(
@@ -1056,7 +1150,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => RouteFormScreen(cooperativeId: cooperative.id),
+              builder: (context) =>
+                  RouteFormScreen(cooperativeId: cooperative.id),
             ),
           );
         },
@@ -1071,7 +1166,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => TransportUnitFormScreen(cooperativeId: cooperative.id),
+              builder: (context) =>
+                  TransportUnitFormScreen(cooperativeId: cooperative.id),
             ),
           );
         },
@@ -1086,7 +1182,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => DriverFormScreen(cooperativeId: cooperative.id),
+              builder: (context) =>
+                  DriverFormScreen(cooperativeId: cooperative.id),
             ),
           );
         },
@@ -1114,27 +1211,27 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return null;
   }
 
-  Widget _buildDashboardTab(DataProvider dataProvider, Cooperative cooperative) {
+  Widget _buildDashboardTab(
+      DataProvider dataProvider, Cooperative cooperative) {
     final routes = dataProvider.getRoutesByCooperative(cooperative.id);
     final units = dataProvider.getUnitsByCooperative(cooperative.id);
 
-    // Filter units based on selection
     final filteredUnits = units.where((u) {
       if (_selectedFilterRouteId == null) return true;
       return u.routeId == _selectedFilterRouteId;
     }).toList();
 
-    // Determine map center
-    LatLng center = const LatLng(10.4806, -66.9036); // Caracas
+    LatLng center = const LatLng(10.4806, -66.9036);
     if (_selectedFilterRouteId != null) {
       try {
-        final selectedRoute = routes.firstWhere((r) => r.id == _selectedFilterRouteId);
+        final selectedRoute =
+            routes.firstWhere((r) => r.id == _selectedFilterRouteId);
         if (selectedRoute.stops.isNotEmpty) {
-          center = LatLng(selectedRoute.stops.first.latitude, selectedRoute.stops.first.longitude);
+          center = LatLng(selectedRoute.stops.first.latitude,
+              selectedRoute.stops.first.longitude);
         }
       } catch (_) {}
     } else if (routes.isNotEmpty) {
-      // Find first route with stops
       LatLng? foundCenter;
       for (final r in routes) {
         if (r.stops.isNotEmpty) {
@@ -1147,7 +1244,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       }
     }
 
-    // Build markers
     final markers = filteredUnits.map((unit) {
       TransportRoute? unitRoute;
       if (unit.routeId != null) {
@@ -1160,7 +1256,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       if (unitRoute != null && unitRoute.stops.isNotEmpty) {
         final stopIndex = unit.plate.hashCode % unitRoute.stops.length;
         final stop = unitRoute.stops[stopIndex];
-        // small deterministic offset so they don't overlap
         final offsetLat = (unit.plate.hashCode % 7 - 3) * 0.0008;
         final offsetLng = (unit.plate.hashCode % 5 - 2) * 0.0008;
         pos = LatLng(stop.latitude + offsetLat, stop.longitude + offsetLng);
@@ -1175,7 +1270,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         width: 40,
         height: 40,
         child: Tooltip(
-          message: 'Modelo: ${unit.model}\nPlaca: ${unit.plate}\nRuta: ${unitRoute?.name ?? 'No asignada'}',
+          message:
+              'Modelo: ${unit.model}\nPlaca: ${unit.plate}\nRuta: ${unitRoute?.name ?? 'No asignada'}',
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -1191,7 +1287,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             padding: const EdgeInsets.all(4),
             child: Icon(
               Icons.directions_bus,
-              color: unitRoute != null ? Colors.orange.shade800 : Colors.grey.shade600,
+              color: unitRoute != null
+                  ? Colors.orange.shade800
+                  : Colors.grey.shade600,
               size: 24,
             ),
           ),
@@ -1209,7 +1307,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             side: BorderSide(color: Colors.grey.shade200),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             child: Row(
               children: [
                 Text(
@@ -1223,10 +1322,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 const Spacer(),
                 DropdownButton<String>(
                   value: _selectedFilterRouteId,
-                  hint: Text('Filtrar por Ruta', style: GoogleFonts.poppins(fontSize: 14)),
+                  hint: Text('Filtrar por Ruta',
+                      style: GoogleFonts.poppins(fontSize: 14)),
                   underline: const SizedBox(),
                   icon: const Icon(Icons.filter_alt_outlined),
-                  style: GoogleFonts.poppins(color: Colors.grey.shade800, fontSize: 14),
+                  style: GoogleFonts.poppins(
+                      color: Colors.grey.shade800, fontSize: 14),
                   items: [
                     const DropdownMenuItem<String>(
                       value: null,
@@ -1257,23 +1358,77 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey.shade200),
               ),
-              child: FlutterMap(
-                options: MapOptions(
-                  initialCenter: center,
-                  initialZoom: 12.0,
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.tesis.admin',
-                  ),
-                  MarkerLayer(
-                    markers: markers,
-                  ),
-                ],
+              child: DashboardMap(
+                center: center,
+                markers: markers,
               ),
             ),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class DashboardMap extends StatefulWidget {
+  final LatLng center;
+  final List<Marker> markers;
+
+  const DashboardMap({
+    super.key,
+    required this.center,
+    required this.markers,
+  });
+
+  @override
+  State<DashboardMap> createState() => _DashboardMapState();
+}
+
+class _DashboardMapState extends State<DashboardMap> {
+  late final MapController _mapController;
+
+  @override
+  void initState() {
+    super.initState();
+    _mapController = MapController();
+  }
+
+  @override
+  void didUpdateWidget(covariant DashboardMap oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.center != widget.center && mounted) {
+      _mapController.move(widget.center, _mapController.camera.zoom);
+    }
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FlutterMap(
+      mapController: _mapController,
+      options: MapOptions(
+        initialCenter: widget.center,
+        initialZoom: 12.0,
+        minZoom: 12.0,
+        maxZoom: 16.0,
+      ),
+      children: [
+        TileLayer(
+          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          userAgentPackageName: 'com.tesis.admin',
+          tileProvider: NetworkTileProvider(),
+          keepBuffer:
+              3, // Mantiene en memoria los mosaicos de hasta 3 niveles de zoom/posición anteriores
+          panBuffer:
+              2, // Suaviza la carga de imágenes en las esquinas al arrastrar
+        ),
+        MarkerLayer(
+          markers: widget.markers,
         ),
       ],
     );

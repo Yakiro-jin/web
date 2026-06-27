@@ -15,11 +15,12 @@ dependencies:
   shared_preferences: ^2.2.2
   google_fonts: ^6.1.0
   uuid: ^4.3.3
-  flutter_map: ^8.3.0
+  # Forzar versión 8.1.0 exacta sin el símbolo ^
+  flutter_map: 8.1.0 
   latlong2: ^0.9.1
   geolocator: ^13.0.1
   http: ^1.2.1
-
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
