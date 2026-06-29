@@ -274,11 +274,37 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                         ),
                         title: Text('Unidad ${unit.unitNumber}', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
                         subtitle: Text('Placa: ${unit.plate}\nRuta actual: $currentRouteName'),
-                        onTap: () {
+                        onTap: () async {
                           dataProvider.assignRouteToUnit(unit.id, widget.route!.id);
+
+                          // --- Crear Viaje al asignar unidad a ruta ---
+                          final ahora = DateTime.now();
+                          // fecha_final absurda para pruebas: 99 años en el futuro
+                          final fechaFinalPrueba = ahora.add(const Duration(days: 36159));
+
+                          // Coordenadas: primera parada de la ruta o valores por defecto
+                          double lat = 10.4806;
+                          double lng = -66.9036;
+                          if (widget.route!.stops.isNotEmpty) {
+                            lat = widget.route!.stops.first.latitude;
+                            lng = widget.route!.stops.first.longitude;
+                          }
+
+                          await dataProvider.createViaje(
+                            fechaInicio: ahora,
+                            fechaFinal: fechaFinalPrueba,
+                            lactitud: lat,
+                            longitud: lng,
+                            idVehiculo: unit.plate,
+                            idRuta: widget.route!.id,
+                            idUser: 1,
+                            incidenciaId: null,
+                          );
+
+                          if (!ctx.mounted || !context.mounted) return;
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Unidad ${unit.unitNumber} asignada a la ruta')),
+                            SnackBar(content: Text('Unidad ${unit.unitNumber} asignada a la ruta y viaje creado')),
                           );
                         },
                       );

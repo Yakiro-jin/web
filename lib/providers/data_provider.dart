@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,6 +7,7 @@ import '../models/route.dart';
 import '../models/transport_unit.dart';
 import '../models/driver.dart';
 import '../models/system_user.dart';
+import '../models/viaje.dart';
 import '../services/api_service.dart';
 
 class DataProvider with ChangeNotifier {
@@ -14,17 +16,26 @@ class DataProvider with ChangeNotifier {
   List<TransportUnit> _units = [];
   List<Driver> _drivers = [];
   List<SystemUser> _systemUsers = [];
+  List<Viaje> _viajes = [];
   bool _isLoading = false;
+  Timer? _viajesPollingTimer;
 
   List<Cooperative> get cooperatives => _cooperatives;
   List<TransportRoute> get routes => _routes;
   List<TransportUnit> get units => _units;
   List<Driver> get drivers => _drivers;
   List<SystemUser> get systemUsers => _systemUsers;
+  List<Viaje> get viajes => _viajes;
   bool get isLoading => _isLoading;
 
   DataProvider() {
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    _viajesPollingTimer?.cancel();
+    super.dispose();
   }
 
   // Load data from API and SharedPreferences (for drivers & assignments)
@@ -135,8 +146,44 @@ class DataProvider with ChangeNotifier {
       debugPrint('Error loading system users: $e');
     }
 
+    try {
+      // 5. Cargar viajes desde API (SIN persistencia local, siempre desde BD)
+      await _fetchViajesFromApi();
+    } catch (e) {
+      debugPrint('Error loading viajes from API: $e');
+      _viajes = [];
+    }
+
     _isLoading = false;
     notifyListeners();
+
+    // Iniciar polling automático de viajes cada 10 segundos
+    _viajesPollingTimer?.cancel();
+    _viajesPollingTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      _fetchViajesFromApi();
+    });
+  }
+
+  /// Carga los viajes desde el API (lista básica + detalle en paralelo).
+  /// NO persiste nada en SharedPreferences.
+  Future<void> _fetchViajesFromApi() async {
+    try {
+      final basicViajes = await ApiService.getViajes();
+      final detailedViajes = await Future.wait(
+        basicViajes.map((v) async {
+          try {
+            return await ApiService.getViajeById(v.idViaje);
+          } catch (e) {
+            debugPrint('Error loading detail viaje ${v.idViaje}: $e');
+            return v;
+          }
+        }),
+      );
+      _viajes = detailedViajes;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error fetching viajes from API: $e');
+    }
   }
 
   // Save local assignments & drivers cache
@@ -608,7 +655,13 @@ class DataProvider with ChangeNotifier {
   }
 
   List<TransportUnit> getUnitsByRoute(String routeId) {
-    return _units.where((u) => u.routeId == routeId).toList();
+    // Obtener las placas de los vehículos que tienen un viaje activo para esta ruta
+    final activePlatesForRoute = _viajes
+        .where((v) => v.idRuta == routeId || v.rutaNumero == routeId)
+        .map((v) => v.idVehiculo.isNotEmpty ? v.idVehiculo : (v.vehiculoPlaca ?? ''))
+        .toSet();
+
+    return _units.where((u) => activePlatesForRoute.contains(u.plate)).toList();
   }
 
   List<TransportUnit> getUnitsByCooperative(String cooperativeId) {
@@ -623,7 +676,7 @@ class DataProvider with ChangeNotifier {
   }
 
   int getUnitCountForRoute(String routeId) {
-    return _units.where((u) => u.routeId == routeId).length;
+    return getUnitsByRoute(routeId).length;
   }
 
   // --- System User CRUD ---
@@ -647,5 +700,94 @@ class DataProvider with ChangeNotifier {
     _systemUsers.removeWhere((u) => u.id == id);
     await _saveLocalCache();
     notifyListeners();
+  }
+
+  // --- VIAJES CRUD ---
+
+  /// Crea un viaje en el API. Después recarga la lista de viajes desde la BD.
+  Future<Viaje?> createViaje({
+    required DateTime fechaInicio,
+    required DateTime fechaFinal,
+    required double lactitud,
+    required double longitud,
+    required String idVehiculo,
+    required String idRuta,
+    int idUser = 1,
+    int? incidenciaId,
+  }) async {
+    try {
+      final viaje = await ApiService.createViaje(
+        fechaInicio: fechaInicio,
+        fechaFinal: fechaFinal,
+        lactitud: lactitud,
+        longitud: longitud,
+        idUser: idUser,
+        idVehiculo: idVehiculo,
+        idRuta: idRuta,
+        incidenciaId: incidenciaId,
+      );
+      // Recargar desde la BD para tener el estado real
+      await _fetchViajesFromApi();
+      return viaje;
+    } catch (e) {
+      debugPrint('Error creating viaje: $e');
+      return null;
+    }
+  }
+
+  /// Elimina un viaje por ID y recarga desde la BD.
+  Future<void> deleteViaje(int id) async {
+    try {
+      await ApiService.deleteViaje(id);
+      await _fetchViajesFromApi();
+    } catch (e) {
+      debugPrint('Error deleting viaje: $e');
+    }
+  }
+
+  /// Actualiza un viaje por ID y recarga desde la BD.
+  Future<void> updateViaje(int id, {
+    DateTime? fechaInicio,
+    DateTime? fechaFinal,
+    double? lactitud,
+    double? longitud,
+    int? idUser,
+    String? idVehiculo,
+    String? idRuta,
+    int? incidenciaId,
+  }) async {
+    try {
+      await ApiService.updateViaje(
+        id,
+        fechaInicio: fechaInicio,
+        fechaFinal: fechaFinal,
+        lactitud: lactitud,
+        longitud: longitud,
+        idUser: idUser,
+        idVehiculo: idVehiculo,
+        idRuta: idRuta,
+        incidenciaId: incidenciaId,
+      );
+      await _fetchViajesFromApi();
+    } catch (e) {
+      debugPrint('Error updating viaje: $e');
+    }
+  }
+
+  /// Recarga manual de viajes (delega al fetcher interno).
+  Future<void> refreshViajes() => _fetchViajesFromApi();
+
+  /// Devuelve los viajes activos directamente de la memoria (ya sincronizados con la BD).
+  List<Viaje> getViajesActivos() => List.unmodifiable(_viajes);
+
+  /// Devuelve el viaje activo de un vehículo por su placa, si existe.
+  Viaje? getViajeByVehiculo(String placa) {
+    try {
+      return _viajes.firstWhere(
+        (v) => v.idVehiculo == placa || v.vehiculoPlaca == placa,
+      );
+    } catch (_) {
+      return null;
+    }
   }
 }

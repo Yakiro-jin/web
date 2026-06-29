@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../models/route.dart';
 
+import '../../models/transport_unit.dart';
+
 class RouteCard extends StatelessWidget {
   final TransportRoute route;
   final int unitCount;
+  final List<TransportUnit> assignedUnits;
   final VoidCallback onTap;
 
   const RouteCard({
     super.key,
     required this.route,
     required this.unitCount,
+    required this.assignedUnits,
     required this.onTap,
   });
 
@@ -97,6 +101,31 @@ class RouteCard extends StatelessWidget {
                         '${route.stops.length} paradas',
                         Colors.blue.shade700,
                         Colors.blue.shade50,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // Listado de buses asignados
+                  Row(
+                    children: [
+                      Icon(Icons.link, size: 16, color: Colors.grey.shade500),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          assignedUnits.isEmpty
+                              ? 'Sin buses asignados'
+                              : 'Buses: ${assignedUnits.map((u) => u.plate).join(', ')}',
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: assignedUnits.isEmpty
+                                ? Colors.grey.shade500
+                                : Colors.orange.shade800,
+                            fontWeight: assignedUnits.isEmpty
+                                ? FontWeight.normal
+                                : FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),

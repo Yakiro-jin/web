@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 import '../../models/cooperative.dart';
 import '../../models/system_user.dart';
 import '../../models/route.dart';
+import '../../models/viaje.dart';
 
 import '../../providers/auth_provider.dart';
 import '../../providers/data_provider.dart';
@@ -30,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen>
   String? _selectedCooperativeId;
   String? _selectedFilterRouteId;
   int _activeTabIndex = 0;
+  LatLng? _mapCenterOverride;
 
   @override
   void initState() {
@@ -196,6 +198,31 @@ class _HomeScreenState extends State<HomeScreen>
     return Consumer<DataProvider>(
       builder: (context, dataProvider, child) {
         final cooperatives = dataProvider.cooperatives;
+
+        if (dataProvider.isLoading && cooperatives.isEmpty) {
+          return const Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: Colors.orange,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Cargando panel de control...',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
 
         if (cooperatives.isEmpty) {
           return Scaffold(
@@ -640,16 +667,19 @@ class _HomeScreenState extends State<HomeScreen>
           maxCrossAxisExtent: 450,
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
-          childAspectRatio: 2.2,
+          // Aumentamos ligeramente la relación de aspecto para dar espacio al texto de los buses asignados
+          childAspectRatio: 1.8,
         ),
         itemCount: routes.length,
         padding: const EdgeInsets.all(12),
         itemBuilder: (context, index) {
           final route = routes[index];
           final unitCount = dataProvider.getUnitCountForRoute(route.id);
+          final routeUnits = dataProvider.getUnitsByRoute(route.id);
           return RouteCard(
             route: route,
             unitCount: unitCount,
+            assignedUnits: routeUnits,
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -671,10 +701,12 @@ class _HomeScreenState extends State<HomeScreen>
       itemBuilder: (context, index) {
         final route = routes[index];
         final unitCount = dataProvider.getUnitCountForRoute(route.id);
+        final routeUnits = dataProvider.getUnitsByRoute(route.id);
 
         return RouteCard(
           route: route,
           unitCount: unitCount,
+          assignedUnits: routeUnits,
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -1211,91 +1243,258 @@ class _HomeScreenState extends State<HomeScreen>
     return null;
   }
 
+  void _showViajeBottomSheet(
+    BuildContext context,
+    Viaje viaje,
+    TransportRoute? ruta,
+  ) {
+    final rutaNombre = viaje.rutaNombre ?? ruta?.name ?? viaje.idRuta;
+    final placaBus = viaje.vehiculoPlaca ?? viaje.idVehiculo;
+    final conductor = viaje.usuarioUsername ?? 'No registrado';
+    final inicio = viaje.fechaInicio.toLocal().toString().substring(0, 16);
+    final lat = viaje.lactitud.toStringAsFixed(6);
+    final lng = viaje.longitud.toStringAsFixed(6);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle bar
+              Center(
+                child: Container(
+                  width: 44,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Header
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade50,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(Icons.directions_bus, color: Colors.orange.shade700, size: 28),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          placaBus.isNotEmpty ? placaBus : 'Sin placa',
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF1A1F2B),
+                          ),
+                        ),
+                        Text(
+                          'Viaje #${viaje.idViaje}',
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color: Colors.orange.shade700,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade100,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 7,
+                          height: 7,
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade600,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'En viaje',
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: Colors.green.shade800,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              const Divider(height: 1),
+              const SizedBox(height: 16),
+              // Detalles
+              _buildDetailRow(Icons.route_outlined, 'Ruta', rutaNombre.isNotEmpty ? rutaNombre : 'Sin asignar'),
+              _buildDetailRow(Icons.person_outline, 'Conductor', conductor),
+              _buildDetailRow(Icons.access_time_outlined, 'Inicio de viaje', inicio),
+              _buildDetailRow(Icons.location_on_outlined, 'Latitud', lat),
+              _buildDetailRow(Icons.location_on_outlined, 'Longitud', lng),
+              const SizedBox(height: 20),
+              // Botón cerrar
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange.shade700,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    elevation: 0,
+                  ),
+                  child: Text('Cerrar', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: Colors.grey.shade500),
+          const SizedBox(width: 10),
+          Text(
+            '$label:',
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              value,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: const Color(0xFF1A1F2B),
+                fontWeight: FontWeight.w600,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDashboardTab(
       DataProvider dataProvider, Cooperative cooperative) {
     final routes = dataProvider.getRoutesByCooperative(cooperative.id);
-    final units = dataProvider.getUnitsByCooperative(cooperative.id);
+    final viajesActivos = dataProvider.getViajesActivos();
+    // Filtrar viajes cuyo vehículo pertenece a esta cooperativa
+    final coopUnitPlates =
+        dataProvider.getUnitsByCooperative(cooperative.id).map((u) => u.plate).toSet();
+    final viajesFiltrados = viajesActivos
+        .where((v) => coopUnitPlates.contains(v.idVehiculo) || (v.vehiculoPlaca != null && coopUnitPlates.contains(v.vehiculoPlaca)))
+        .toList();
 
-    final filteredUnits = units.where((u) {
-      if (_selectedFilterRouteId == null) return true;
-      return u.routeId == _selectedFilterRouteId;
-    }).toList();
+    // Filtrar por ruta seleccionada si corresponde.
+    final viajesMostrados = _selectedFilterRouteId == null
+        ? viajesFiltrados
+        : viajesFiltrados.where((v) {
+            final targetRuta = v.idRuta.isNotEmpty ? v.idRuta : v.rutaNumero;
+            return targetRuta == _selectedFilterRouteId;
+          }).toList();
 
-    LatLng center = const LatLng(10.4806, -66.9036);
-    if (_selectedFilterRouteId != null) {
-      try {
-        final selectedRoute =
-            routes.firstWhere((r) => r.id == _selectedFilterRouteId);
-        if (selectedRoute.stops.isNotEmpty) {
-          center = LatLng(selectedRoute.stops.first.latitude,
-              selectedRoute.stops.first.longitude);
-        }
-      } catch (_) {}
-    } else if (routes.isNotEmpty) {
-      LatLng? foundCenter;
-      for (final r in routes) {
-        if (r.stops.isNotEmpty) {
-          foundCenter = LatLng(r.stops.first.latitude, r.stops.first.longitude);
-          break;
-        }
-      }
-      if (foundCenter != null) {
-        center = foundCenter;
-      }
-    }
+    // Marcadores: buses en viaje activo con coordenadas reales del viaje
+    final markers = viajesMostrados.map((viaje) {
+      final pos = LatLng(viaje.lactitud, viaje.longitud);
 
-    final markers = filteredUnits.map((unit) {
+      // Datos adicionales de la ruta
       TransportRoute? unitRoute;
-      if (unit.routeId != null) {
-        try {
-          unitRoute = routes.firstWhere((r) => r.id == unit.routeId);
-        } catch (_) {}
-      }
-
-      LatLng pos;
-      if (unitRoute != null && unitRoute.stops.isNotEmpty) {
-        final stopIndex = unit.plate.hashCode % unitRoute.stops.length;
-        final stop = unitRoute.stops[stopIndex];
-        final offsetLat = (unit.plate.hashCode % 7 - 3) * 0.0008;
-        final offsetLng = (unit.plate.hashCode % 5 - 2) * 0.0008;
-        pos = LatLng(stop.latitude + offsetLat, stop.longitude + offsetLng);
-      } else {
-        final offsetLat = (unit.plate.hashCode % 11 - 5) * 0.005;
-        final offsetLng = (unit.plate.hashCode % 7 - 3) * 0.005;
-        pos = LatLng(center.latitude + offsetLat, center.longitude + offsetLng);
-      }
+      try {
+        unitRoute = routes.firstWhere((r) => r.id == viaje.idRuta || r.id == viaje.rutaNumero);
+      } catch (_) {}
 
       return Marker(
         point: pos,
-        width: 40,
-        height: 40,
-        child: Tooltip(
-          message:
-              'Modelo: ${unit.model}\nPlaca: ${unit.plate}\nRuta: ${unitRoute?.name ?? 'No asignada'}',
+        width: 48,
+        height: 48,
+        child: GestureDetector(
+          onTap: () => _showViajeBottomSheet(context, viaje, unitRoute),
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
               shape: BoxShape.circle,
+              border: Border.all(color: Colors.orange.shade700, width: 2.5),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
+                  color: Colors.black.withValues(alpha: 0.25),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
             padding: const EdgeInsets.all(4),
             child: Icon(
               Icons.directions_bus,
-              color: unitRoute != null
-                  ? Colors.orange.shade800
-                  : Colors.grey.shade600,
-              size: 24,
+              color: Colors.orange.shade800,
+              size: 26,
             ),
           ),
         ),
       );
     }).toList();
+
+    // Centro del mapa con prioridad a _mapCenterOverride si está definido
+    LatLng center = _mapCenterOverride ?? const LatLng(10.4806, -66.9036);
+    if (_mapCenterOverride == null) {
+      if (_selectedFilterRouteId != null) {
+        try {
+          final selectedRoute =
+              routes.firstWhere((r) => r.id == _selectedFilterRouteId);
+          if (selectedRoute.stops.isNotEmpty) {
+            center = LatLng(selectedRoute.stops.first.latitude,
+                selectedRoute.stops.first.longitude);
+          }
+        } catch (_) {}
+      } else if (viajesMostrados.isNotEmpty) {
+        center = LatLng(viajesMostrados.first.lactitud, viajesMostrados.first.longitud);
+      } else if (routes.isNotEmpty) {
+        for (final r in routes) {
+          if (r.stops.isNotEmpty) {
+            center = LatLng(r.stops.first.latitude, r.stops.first.longitude);
+            break;
+          }
+        }
+      }
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1319,7 +1518,40 @@ class _HomeScreenState extends State<HomeScreen>
                     color: const Color(0xFF1A1F2B),
                   ),
                 ),
+                const SizedBox(width: 8),
+                // Badge: buses en viaje activo
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: viajesMostrados.isNotEmpty
+                        ? Colors.orange.shade100
+                        : Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${viajesMostrados.length} en viaje',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: viajesMostrados.isNotEmpty
+                          ? Colors.orange.shade800
+                          : Colors.grey.shade600,
+                    ),
+                  ),
+                ),
                 const Spacer(),
+                // Botón refrescar viajes
+                IconButton(
+                  icon: const Icon(Icons.refresh_rounded),
+                  tooltip: 'Actualizar viajes',
+                  color: Colors.grey.shade600,
+                  onPressed: () {
+                    dataProvider.refreshViajes();
+                    setState(() {
+                      _mapCenterOverride = null;
+                    });
+                  },
+                ),
                 DropdownButton<String>(
                   value: _selectedFilterRouteId,
                   hint: Text('Filtrar por Ruta',
@@ -1343,6 +1575,7 @@ class _HomeScreenState extends State<HomeScreen>
                   onChanged: (val) {
                     setState(() {
                       _selectedFilterRouteId = val;
+                      _mapCenterOverride = null;
                     });
                   },
                 ),
@@ -1352,17 +1585,178 @@ class _HomeScreenState extends State<HomeScreen>
         ),
         const SizedBox(height: 12),
         Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade200),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Listado lateral de unidades en viaje (30% de ancho en pantallas grandes)
+              Expanded(
+                flex: 3,
+                child: Card(
+                  elevation: 0,
+                  margin: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(color: Colors.grey.shade200),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          color: Colors.grey.shade50,
+                          child: Text(
+                            'Unidades Activas',
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: const Color(0xFF1A1F2B),
+                            ),
+                          ),
+                        ),
+                        const Divider(height: 1),
+                        Expanded(
+                          child: viajesMostrados.isEmpty
+                              ? Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Text(
+                                      'Sin viajes activos',
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.grey.shade500,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : ListView.separated(
+                                  itemCount: viajesMostrados.length,
+                                  separatorBuilder: (context, index) => const Divider(height: 1),
+                                  itemBuilder: (context, index) {
+                                    final viaje = viajesMostrados[index];
+                                    final placaBus = viaje.vehiculoPlaca ?? viaje.idVehiculo;
+                                    
+                                    TransportRoute? r;
+                                    try {
+                                      r = routes.firstWhere((route) => route.id == viaje.idRuta || route.id == viaje.rutaNumero);
+                                    } catch (_) {}
+                                    final rName = viaje.rutaNombre ?? r?.name ?? 'Ruta #${viaje.idRuta}';
+
+                                    final isFocused = _mapCenterOverride != null &&
+                                        _mapCenterOverride!.latitude == viaje.lactitud &&
+                                        _mapCenterOverride!.longitude == viaje.longitud;
+
+                                    return ListTile(
+                                      dense: true,
+                                      selected: isFocused,
+                                      selectedTileColor: Colors.orange.shade50,
+                                      leading: CircleAvatar(
+                                        radius: 16,
+                                        backgroundColor: isFocused ? Colors.orange.shade700 : Colors.orange.shade100,
+                                        child: Icon(
+                                          Icons.directions_bus,
+                                          size: 16,
+                                          color: isFocused ? Colors.white : Colors.orange.shade800,
+                                        ),
+                                      ),
+                                      title: Text(
+                                        placaBus.isNotEmpty ? placaBus : 'Sin placa',
+                                        style: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                          color: const Color(0xFF1A1F2B),
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        rName,
+                                        style: GoogleFonts.poppins(fontSize: 11),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      trailing: const Icon(Icons.gps_fixed, size: 16, color: Colors.grey),
+                                      onTap: () {
+                                        setState(() {
+                                          _mapCenterOverride = LatLng(viaje.lactitud, viaje.longitud);
+                                        });
+                                        _showViajeBottomSheet(context, viaje, r);
+                                      },
+                                    );
+                                  },
+                                ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-              child: DashboardMap(
-                center: center,
-                markers: markers,
+              const SizedBox(width: 12),
+              // Mapa (70% de ancho)
+              Expanded(
+                flex: 7,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: viajesMostrados.isEmpty
+                        ? Stack(
+                            children: [
+                              DashboardMap(
+                                center: center,
+                                markers: const [],
+                              ),
+                              Center(
+                                child: Container(
+                                  margin: const EdgeInsets.all(24),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 18),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.92),
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.1),
+                                        blurRadius: 12,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.directions_bus_outlined,
+                                          size: 48, color: Colors.grey.shade400),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        'No hay buses en viaje activo',
+                                        style: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 15,
+                                          color: Colors.grey.shade700,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Asigna una unidad a una ruta para iniciar un viaje',
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.poppins(
+                                            fontSize: 12,
+                                            color: Colors.grey.shade500),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : DashboardMap(
+                            center: center,
+                            markers: markers,
+                          ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ],

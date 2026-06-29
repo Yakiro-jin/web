@@ -6,6 +6,7 @@ import '../models/cooperative.dart';
 import '../models/route.dart';
 import '../models/transport_unit.dart';
 import '../models/driver.dart';
+import '../models/viaje.dart';
 
 class ApiService {
   static final http.Client _client = http.Client();
@@ -18,7 +19,8 @@ class ApiService {
   // --- COOPERATIVE ENDPOINTS ---
 
   static Future<List<Cooperative>> getCooperativas() async {
-    final url = Uri.parse('${ApiConfig.baseUrl}/cooperativa/cooperativas/todas');
+    final url =
+        Uri.parse('${ApiConfig.baseUrl}/cooperativa/cooperativas/todas');
     debugPrint('GET: $url');
     try {
       final response = await _client.get(url, headers: _headers);
@@ -36,7 +38,8 @@ class ApiService {
   }
 
   static Future<Cooperative> createCooperativa(Cooperative cooperative) async {
-    final url = Uri.parse('${ApiConfig.baseUrl}/cooperativa/cooperativas/crear');
+    final url =
+        Uri.parse('${ApiConfig.baseUrl}/cooperativa/cooperativas/crear');
     debugPrint('POST: $url');
     final body = jsonEncode({
       'rif_cooperativa': cooperative.id,
@@ -61,7 +64,8 @@ class ApiService {
   }
 
   static Future<Cooperative> updateCooperativa(Cooperative cooperative) async {
-    final url = Uri.parse('${ApiConfig.baseUrl}/cooperativa/cooperativas/actualizar');
+    final url =
+        Uri.parse('${ApiConfig.baseUrl}/cooperativa/cooperativas/actualizar');
     debugPrint('PATCH: $url');
     final body = jsonEncode({
       'rif_cooperativa': cooperative.id,
@@ -86,7 +90,8 @@ class ApiService {
   }
 
   static Future<void> deleteCooperativa(String rif) async {
-    final url = Uri.parse('${ApiConfig.baseUrl}/cooperativa/cooperativas/eliminar');
+    final url =
+        Uri.parse('${ApiConfig.baseUrl}/cooperativa/cooperativas/eliminar');
     debugPrint('DELETE: $url');
     final body = jsonEncode({'rif_cooperativa': rif});
     debugPrint('Body: $body');
@@ -185,7 +190,9 @@ class ApiService {
     try {
       final response = await _client.post(url, headers: _headers, body: body);
       debugPrint('Status: ${response.statusCode}, Body: ${response.body}');
-      if (response.statusCode != 200 && response.statusCode != 201 && response.statusCode != 204) {
+      if (response.statusCode != 200 &&
+          response.statusCode != 201 &&
+          response.statusCode != 204) {
         throw Exception('Failed to delete route: ${response.statusCode}');
       }
     } catch (e) {
@@ -240,7 +247,8 @@ class ApiService {
   }
 
   static Future<TransportUnit> updateVehiculo(TransportUnit unit) async {
-    final url = Uri.parse('${ApiConfig.baseUrl}/vehiculos/vehiculo/actualizar/${unit.plate}');
+    final url = Uri.parse(
+        '${ApiConfig.baseUrl}/vehiculos/vehiculo/actualizar/${unit.plate}');
     debugPrint('PATCH: $url');
     final body = jsonEncode({
       'modelo': unit.model,
@@ -295,9 +303,11 @@ class ApiService {
         } else if (decoded is Map) {
           if (decoded.containsKey('data') && decoded['data'] is List) {
             list = decoded['data'];
-          } else if (decoded.containsKey('personas') && decoded['personas'] is List) {
+          } else if (decoded.containsKey('personas') &&
+              decoded['personas'] is List) {
             list = decoded['personas'];
-          } else if (decoded.containsKey('result') && decoded['result'] is List) {
+          } else if (decoded.containsKey('result') &&
+              decoded['result'] is List) {
             list = decoded['result'];
           }
         }
@@ -373,6 +383,166 @@ class ApiService {
       }
     } catch (e) {
       debugPrint('Error deleting persona: $e');
+      rethrow;
+    }
+  }
+
+  // --- VIAJES ENDPOINTS ---
+
+  /// POST /viajes/Crear-Viaje
+  static Future<Viaje> createViaje({
+    required DateTime fechaInicio,
+    required DateTime fechaFinal,
+    required double lactitud,
+    required double longitud,
+    required int idUser,
+    required String idVehiculo,
+    required String idRuta,
+    int? incidenciaId,
+  }) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/viajes/Crear-Viaje');
+    debugPrint('POST: $url');
+    final body = jsonEncode({
+      'fecha_inicio': fechaInicio.toIso8601String(),
+      'fecha_final': fechaFinal.toIso8601String(),
+      'lactitud': lactitud,
+      'longitud': longitud,
+      'id_user': idUser,
+      'id_vehiculo': idVehiculo,
+      'id_ruta': idRuta,
+      'incidencia_id': incidenciaId,
+    });
+    debugPrint('Body: $body');
+    try {
+      final response = await _client.post(url, headers: _headers, body: body);
+      debugPrint('Status: ${response.statusCode}, Body: ${response.body}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return Viaje.fromJson(
+            jsonDecode(response.body) as Map<String, dynamic>);
+      } else {
+        throw Exception('Failed to create viaje: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error creating viaje: $e');
+      rethrow;
+    }
+  }
+
+  /// GET /viajes/Obtener-Viaje — devuelve viajes
+  static Future<List<Viaje>> getViajes() async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/viajes/Obtener-Viaje');
+    debugPrint('GET: $url');
+    try {
+      final response = await _client.get(url, headers: _headers);
+      debugPrint('Status: ${response.statusCode}, Body: ${response.body}');
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        List<dynamic> list = [];
+        if (decoded is List) {
+          list = decoded;
+        } else if (decoded is Map && decoded.containsKey('control')) {
+          final control = decoded['control'];
+          if (control is List) {
+            list = control;
+          }
+        }
+        return list
+            .map((j) => Viaje.fromJson(j as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw Exception('Failed to load viajes: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error getting viajes: $e');
+      rethrow;
+    }
+  }
+
+  /// GET /viajes/Obtener-viaje-Id/:id
+  static Future<Viaje> getViajeById(int id) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/viajes/Obtener-viaje-Id/$id');
+    debugPrint('GET: $url');
+    try {
+      final response = await _client.get(url, headers: _headers);
+      debugPrint('Status: ${response.statusCode}, Body: ${response.body}');
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        Map<String, dynamic> data;
+        if (decoded is Map && decoded.containsKey('control')) {
+          data = decoded['control'] as Map<String, dynamic>;
+        } else {
+          data = decoded as Map<String, dynamic>;
+        }
+        return Viaje.fromJson(data);
+      } else {
+        throw Exception('Failed to get viaje $id: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error getting viaje by id: $e');
+      rethrow;
+    }
+  }
+
+  /// DELETE /viajes/Elimnar-viaje/:id
+  static Future<void> deleteViaje(int id) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/viajes/Elimnar-viaje/$id');
+    debugPrint('DELETE: $url');
+    try {
+      final response = await _client.delete(url, headers: _headers);
+      debugPrint('Status: ${response.statusCode}, Body: ${response.body}');
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        throw Exception('Failed to delete viaje $id: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error deleting viaje: $e');
+      rethrow;
+    }
+  }
+
+  /// PATCH /viajes/Actualizar-viaje/:id
+  static Future<Viaje> updateViaje(
+    int id, {
+    DateTime? fechaInicio,
+    DateTime? fechaFinal,
+    double? lactitud,
+    double? longitud,
+    int? idUser,
+    String? idVehiculo,
+    String? idRuta,
+    int? incidenciaId,
+  }) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/viajes/Actualizar-viaje/$id');
+    debugPrint('PATCH: $url');
+    final Map<String, dynamic> bodyMap = {};
+    if (fechaInicio != null)
+      bodyMap['fecha_inicio'] = fechaInicio.toIso8601String();
+    if (fechaFinal != null)
+      bodyMap['fecha_final'] = fechaFinal.toIso8601String();
+    if (lactitud != null) bodyMap['lactitud'] = lactitud;
+    if (longitud != null) bodyMap['longitud'] = longitud;
+    if (idUser != null) bodyMap['id_user'] = idUser;
+    if (idVehiculo != null) bodyMap['id_vehiculo'] = idVehiculo;
+    if (idRuta != null) bodyMap['id_ruta'] = idRuta;
+    bodyMap['incidencia_id'] = incidenciaId;
+    final body = jsonEncode(bodyMap);
+    debugPrint('Body: $body');
+    try {
+      final response = await _client.patch(url, headers: _headers, body: body);
+      debugPrint('Status: ${response.statusCode}, Body: ${response.body}');
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        Map<String, dynamic> data;
+        if (decoded is Map && decoded.containsKey('control')) {
+          data = decoded['control'] as Map<String, dynamic>;
+        } else {
+          data = decoded as Map<String, dynamic>;
+        }
+        return Viaje.fromJson(data);
+      } else {
+        throw Exception('Failed to update viaje $id: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error updating viaje: $e');
       rethrow;
     }
   }

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../models/transport_unit.dart';
 import '../../models/driver.dart';
+import '../../models/route.dart';
 import '../../providers/data_provider.dart';
 
 class TransportUnitFormScreen extends StatefulWidget {
@@ -218,6 +219,106 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
     );
   }
 
+  // Muestra un diálogo con las rutas de la cooperativa actual para asignarla a la unidad.
+  void _showRouteSelectionDialog(BuildContext context, DataProvider dataProvider) {
+    final routes = dataProvider.getRoutesByCooperative(widget.cooperativeId);
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: Text(
+            'Asignar Ruta a Unidad ${widget.unit!.plate}',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: routes.isEmpty
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.route_outlined, size: 48, color: Colors.grey),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No hay rutas registradas en esta cooperativa.',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(color: Colors.grey.shade600),
+                      ),
+                    ],
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: routes.length,
+                    itemBuilder: (context, index) {
+                      final route = routes[index];
+                      
+                      final currentUnitState = dataProvider.units.firstWhere(
+                        (u) => u.id == widget.unit!.id,
+                        orElse: () => widget.unit!,
+                      );
+                      final isCurrent = currentUnitState.routeId == route.id;
+
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: isCurrent ? Colors.green.shade100 : Colors.grey.shade100,
+                          child: Icon(
+                            Icons.route,
+                            color: isCurrent ? Colors.green.shade800 : Colors.grey.shade700,
+                          ),
+                        ),
+                        title: Text(
+                          route.name,
+                          style: GoogleFonts.poppins(
+                            fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                        subtitle: Text('${route.origin} → ${route.destination}'),
+                        trailing: isCurrent ? const Icon(Icons.check_circle, color: Colors.green) : null,
+                        onTap: () async {
+                          dataProvider.assignRouteToUnit(widget.unit!.id, route.id);
+                          
+                          // --- Crear Viaje al asignar ruta a unidad ---
+                          final ahora = DateTime.now();
+                          final fechaFinalPrueba = ahora.add(const Duration(days: 36159));
+                          double lat = 10.4806;
+                          double lng = -66.9036;
+                          if (route.stops.isNotEmpty) {
+                            lat = route.stops.first.latitude;
+                            lng = route.stops.first.longitude;
+                          }
+                          await dataProvider.createViaje(
+                            fechaInicio: ahora,
+                            fechaFinal: fechaFinalPrueba,
+                            lactitud: lat,
+                            longitud: lng,
+                            idVehiculo: widget.unit!.plate,
+                            idRuta: route.id,
+                            idUser: 1,
+                            incidenciaId: null,
+                          );
+
+                          if (!ctx.mounted || !context.mounted) return;
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Unidad asignada a ruta y viaje creado')),
+                          );
+                        },
+                      );
+                    },
+                  ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Obtenemos DataProvider de forma reactiva para actualizar la UI en cambios de asignación o borrado
@@ -406,6 +507,122 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                                             Navigator.of(ctx).pop();
                                             ScaffoldMessenger.of(context).showSnackBar(
                                               const SnackBar(content: Text('Chofer desasignado de la unidad')),
+                                            );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                            foregroundColor: Colors.white,
+                                            elevation: 0,
+                                          ),
+                                          child: const Text('Quitar'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      // --- SECCIÓN RUTA ASIGNADA ---
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildSectionTitle('Ruta Asignada', Icons.route_outlined),
+                          TextButton.icon(
+                            onPressed: () => _showRouteSelectionDialog(context, dataProvider),
+                            icon: const Icon(Icons.add, size: 18),
+                            label: const Text('Asignar'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.orange.shade800,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Builder(
+                        builder: (context) {
+                          final currentUnit = dataProvider.units.firstWhere(
+                            (u) => u.id == widget.unit!.id,
+                            orElse: () => widget.unit!,
+                          );
+                          
+                          if (currentUnit.routeId == null || currentUnit.routeId!.isEmpty) {
+                            return Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                children: [
+                                  Icon(Icons.route_outlined, size: 40, color: Colors.grey.shade400),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Sin ruta asignada',
+                                    style: TextStyle(color: Colors.red.shade400, fontSize: 14, fontWeight: FontWeight.w500),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          // Buscar detalles de la ruta asignada
+                          final route = dataProvider.routes.firstWhere(
+                            (r) => r.id == currentUnit.routeId,
+                            orElse: () => TransportRoute(
+                              id: currentUnit.routeId!,
+                              name: 'Ruta No Encontrada',
+                              description: '',
+                              fare: 0,
+                              origin: '',
+                              destination: '',
+                              cooperativeId: widget.cooperativeId,
+                              stops: [],
+                              createdAt: DateTime.now(),
+                            ),
+                          );
+
+                          return Card(
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(color: Colors.grey.shade200),
+                            ),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.orange.shade100,
+                                child: Icon(Icons.route, color: Colors.orange.shade800),
+                              ),
+                              title: Text(
+                                route.name,
+                                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                              ),
+                              subtitle: Text('${route.origin} → ${route.destination}'),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.link_off, color: Colors.red),
+                                tooltip: 'Quitar Ruta',
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      title: Text('Confirmar desasignación', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+                                      content: Text('¿Está seguro de quitar la ruta "${route.name}" de esta unidad?'),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.of(ctx).pop(),
+                                          child: const Text('Cancelar'),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            dataProvider.assignRouteToUnit(widget.unit!.id, null);
+                                            Navigator.of(ctx).pop();
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(content: Text('Ruta desasignada de la unidad')),
                                             );
                                           },
                                           style: ElevatedButton.styleFrom(
