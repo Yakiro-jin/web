@@ -1291,7 +1291,8 @@ class _HomeScreenState extends State<HomeScreen>
                       color: Colors.orange.shade50,
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Icon(Icons.directions_bus, color: Colors.orange.shade700, size: 28),
+                    child: Icon(Icons.directions_bus,
+                        color: Colors.orange.shade700, size: 28),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -1318,7 +1319,8 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.green.shade100,
                       borderRadius: BorderRadius.circular(20),
@@ -1352,9 +1354,11 @@ class _HomeScreenState extends State<HomeScreen>
               const Divider(height: 1),
               const SizedBox(height: 16),
               // Detalles
-              _buildDetailRow(Icons.route_outlined, 'Ruta', rutaNombre.isNotEmpty ? rutaNombre : 'Sin asignar'),
+              _buildDetailRow(Icons.route_outlined, 'Ruta',
+                  rutaNombre.isNotEmpty ? rutaNombre : 'Sin asignar'),
               _buildDetailRow(Icons.person_outline, 'Conductor', conductor),
-              _buildDetailRow(Icons.access_time_outlined, 'Inicio de viaje', inicio),
+              _buildDetailRow(
+                  Icons.access_time_outlined, 'Inicio de viaje', inicio),
               _buildDetailRow(Icons.location_on_outlined, 'Latitud', lat),
               _buildDetailRow(Icons.location_on_outlined, 'Longitud', lng),
               const SizedBox(height: 20),
@@ -1367,10 +1371,12 @@ class _HomeScreenState extends State<HomeScreen>
                     backgroundColor: Colors.orange.shade700,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
                     elevation: 0,
                   ),
-                  child: Text('Cerrar', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                  child: Text('Cerrar',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
                 ),
               ),
             ],
@@ -1418,10 +1424,15 @@ class _HomeScreenState extends State<HomeScreen>
     final routes = dataProvider.getRoutesByCooperative(cooperative.id);
     final viajesActivos = dataProvider.getViajesActivos();
     // Filtrar viajes cuyo vehículo pertenece a esta cooperativa
-    final coopUnitPlates =
-        dataProvider.getUnitsByCooperative(cooperative.id).map((u) => u.plate).toSet();
+    final coopUnitPlates = dataProvider
+        .getUnitsByCooperative(cooperative.id)
+        .map((u) => u.plate)
+        .toSet();
     final viajesFiltrados = viajesActivos
-        .where((v) => coopUnitPlates.contains(v.idVehiculo) || (v.vehiculoPlaca != null && coopUnitPlates.contains(v.vehiculoPlaca)))
+        .where((v) =>
+            coopUnitPlates.contains(v.idVehiculo) ||
+            (v.vehiculoPlaca != null &&
+                coopUnitPlates.contains(v.vehiculoPlaca)))
         .toList();
 
     // Filtrar por ruta seleccionada si corresponde.
@@ -1439,7 +1450,8 @@ class _HomeScreenState extends State<HomeScreen>
       // Datos adicionales de la ruta
       TransportRoute? unitRoute;
       try {
-        unitRoute = routes.firstWhere((r) => r.id == viaje.idRuta || r.id == viaje.rutaNumero);
+        unitRoute = routes.firstWhere(
+            (r) => r.id == viaje.idRuta || r.id == viaje.rutaNumero);
       } catch (_) {}
 
       return Marker(
@@ -1485,7 +1497,8 @@ class _HomeScreenState extends State<HomeScreen>
           }
         } catch (_) {}
       } else if (viajesMostrados.isNotEmpty) {
-        center = LatLng(viajesMostrados.first.lactitud, viajesMostrados.first.longitud);
+        center = LatLng(
+            viajesMostrados.first.lactitud, viajesMostrados.first.longitud);
       } else if (routes.isNotEmpty) {
         for (final r in routes) {
           if (r.stops.isNotEmpty) {
@@ -1521,7 +1534,8 @@ class _HomeScreenState extends State<HomeScreen>
                 const SizedBox(width: 8),
                 // Badge: buses en viaje activo
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: viajesMostrados.isNotEmpty
                         ? Colors.orange.shade100
@@ -1632,20 +1646,29 @@ class _HomeScreenState extends State<HomeScreen>
                                 )
                               : ListView.separated(
                                   itemCount: viajesMostrados.length,
-                                  separatorBuilder: (context, index) => const Divider(height: 1),
+                                  separatorBuilder: (context, index) =>
+                                      const Divider(height: 1),
                                   itemBuilder: (context, index) {
                                     final viaje = viajesMostrados[index];
-                                    final placaBus = viaje.vehiculoPlaca ?? viaje.idVehiculo;
-                                    
+                                    final placaBus =
+                                        viaje.vehiculoPlaca ?? viaje.idVehiculo;
+
                                     TransportRoute? r;
                                     try {
-                                      r = routes.firstWhere((route) => route.id == viaje.idRuta || route.id == viaje.rutaNumero);
+                                      r = routes.firstWhere((route) =>
+                                          route.id == viaje.idRuta ||
+                                          route.id == viaje.rutaNumero);
                                     } catch (_) {}
-                                    final rName = viaje.rutaNombre ?? r?.name ?? 'Ruta #${viaje.idRuta}';
+                                    final rName = viaje.rutaNombre ??
+                                        r?.name ??
+                                        'Ruta #${viaje.idRuta}';
 
-                                    final isFocused = _mapCenterOverride != null &&
-                                        _mapCenterOverride!.latitude == viaje.lactitud &&
-                                        _mapCenterOverride!.longitude == viaje.longitud;
+                                    final isFocused =
+                                        _mapCenterOverride != null &&
+                                            _mapCenterOverride!.latitude ==
+                                                viaje.lactitud &&
+                                            _mapCenterOverride!.longitude ==
+                                                viaje.longitud;
 
                                     return ListTile(
                                       dense: true,
@@ -1653,15 +1676,21 @@ class _HomeScreenState extends State<HomeScreen>
                                       selectedTileColor: Colors.orange.shade50,
                                       leading: CircleAvatar(
                                         radius: 16,
-                                        backgroundColor: isFocused ? Colors.orange.shade700 : Colors.orange.shade100,
+                                        backgroundColor: isFocused
+                                            ? Colors.orange.shade700
+                                            : Colors.orange.shade100,
                                         child: Icon(
                                           Icons.directions_bus,
                                           size: 16,
-                                          color: isFocused ? Colors.white : Colors.orange.shade800,
+                                          color: isFocused
+                                              ? Colors.white
+                                              : Colors.orange.shade800,
                                         ),
                                       ),
                                       title: Text(
-                                        placaBus.isNotEmpty ? placaBus : 'Sin placa',
+                                        placaBus.isNotEmpty
+                                            ? placaBus
+                                            : 'Sin placa',
                                         style: GoogleFonts.poppins(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 13,
@@ -1670,15 +1699,19 @@ class _HomeScreenState extends State<HomeScreen>
                                       ),
                                       subtitle: Text(
                                         rName,
-                                        style: GoogleFonts.poppins(fontSize: 11),
+                                        style:
+                                            GoogleFonts.poppins(fontSize: 11),
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                      trailing: const Icon(Icons.gps_fixed, size: 16, color: Colors.grey),
+                                      trailing: const Icon(Icons.gps_fixed,
+                                          size: 16, color: Colors.grey),
                                       onTap: () {
                                         setState(() {
-                                          _mapCenterOverride = LatLng(viaje.lactitud, viaje.longitud);
+                                          _mapCenterOverride = LatLng(
+                                              viaje.lactitud, viaje.longitud);
                                         });
-                                        _showViajeBottomSheet(context, viaje, r);
+                                        _showViajeBottomSheet(
+                                            context, viaje, r);
                                       },
                                     );
                                   },
@@ -1716,7 +1749,8 @@ class _HomeScreenState extends State<HomeScreen>
                                     borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.1),
+                                        color:
+                                            Colors.black.withValues(alpha: 0.1),
                                         blurRadius: 12,
                                       ),
                                     ],
@@ -1725,7 +1759,8 @@ class _HomeScreenState extends State<HomeScreen>
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Icon(Icons.directions_bus_outlined,
-                                          size: 48, color: Colors.grey.shade400),
+                                          size: 48,
+                                          color: Colors.grey.shade400),
                                       const SizedBox(height: 12),
                                       Text(
                                         'No hay buses en viaje activo',
@@ -1809,7 +1844,7 @@ class _DashboardMapState extends State<DashboardMap> {
         initialCenter: widget.center,
         initialZoom: 12.0,
         minZoom: 12.0,
-        maxZoom: 16.0,
+        maxZoom: 20.0,
       ),
       children: [
         TileLayer(
