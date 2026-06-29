@@ -299,7 +299,7 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
                                 SizedBox(
                                   width: 100,
                                   child: DropdownButtonFormField<String>(
-                                    value: _selectedRifPrefix,
+                                    initialValue: _selectedRifPrefix,
                                     decoration: InputDecoration(
                                       labelText: 'Tipo',
                                       labelStyle: const TextStyle(fontSize: 12),
@@ -388,8 +388,9 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
                                           : Colors.white,
                                     ),
                                     validator: (v) {
-                                      if (v == null || v.trim().isEmpty)
+                                      if (v == null || v.trim().isEmpty) {
                                         return 'Campo requerido';
+                                      }
                                       // Validar formato de dígitos: 8 números, guion, 1 número
                                       if (!RegExp(r'^\d{8}-\d$')
                                           .hasMatch(v.trim())) {
@@ -416,7 +417,7 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
                             // ─── CAMPO: Ubicación (Selector de Municipio) ───
                             // Dropdown con los 11 municipios del Estado Nueva Esparta
                             DropdownButtonFormField<String>(
-                              value: _selectedMunicipio,
+                              initialValue: _selectedMunicipio,
                               isExpanded: true,
                               decoration: InputDecoration(
                                 labelText: 'Municipio / Ubicación',

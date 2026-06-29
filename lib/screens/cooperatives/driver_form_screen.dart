@@ -173,8 +173,9 @@ class _DriverFormScreenState extends State<DriverFormScreen> {
                               icon: Icons.email,
                               keyboardType: TextInputType.emailAddress,
                               validator: (v) {
-                                if (v == null || v.isEmpty)
+                                if (v == null || v.isEmpty) {
                                   return 'Campo requerido';
+                                }
                                 if (!v.contains('@')) return 'Email inválido';
                                 return null;
                               },
@@ -211,11 +212,13 @@ class _DriverFormScreenState extends State<DriverFormScreen> {
                                 FilteringTextInputFormatter.digitsOnly
                               ],
                               validator: (v) {
-                                if (v == null || v.isEmpty)
+                                if (v == null || v.isEmpty) {
                                   return 'Campo requerido';
+                                }
                                 final age = int.tryParse(v);
-                                if (age == null || age <= 0)
+                                if (age == null || age <= 0) {
                                   return 'Edad inválida';
+                                }
                                 return null;
                               },
                             ),

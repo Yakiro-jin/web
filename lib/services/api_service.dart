@@ -514,10 +514,12 @@ class ApiService {
     final url = Uri.parse('${ApiConfig.baseUrl}/viajes/Actualizar-viaje/$id');
     debugPrint('PATCH: $url');
     final Map<String, dynamic> bodyMap = {};
-    if (fechaInicio != null)
+    if (fechaInicio != null) {
       bodyMap['fecha_inicio'] = fechaInicio.toIso8601String();
-    if (fechaFinal != null)
+    }
+    if (fechaFinal != null) {
       bodyMap['fecha_final'] = fechaFinal.toIso8601String();
+    }
     if (lactitud != null) bodyMap['lactitud'] = lactitud;
     if (longitud != null) bodyMap['longitud'] = longitud;
     if (idUser != null) bodyMap['id_user'] = idUser;

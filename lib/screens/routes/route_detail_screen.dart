@@ -17,7 +17,8 @@ class RouteDetailScreen extends StatefulWidget {
   State<RouteDetailScreen> createState() => _RouteDetailScreenState();
 }
 
-class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTickerProviderStateMixin {
+class _RouteDetailScreenState extends State<RouteDetailScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -33,8 +34,10 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
   }
 
   void _showAssignUnitDialog(BuildContext context, DataProvider dataProvider) {
-    final allUnits = dataProvider.getUnitsByCooperative(widget.route.cooperativeId);
-    final assignableUnits = allUnits.where((u) => u.routeId != widget.route.id).toList();
+    final allUnits =
+        dataProvider.getUnitsByCooperative(widget.route.cooperativeId);
+    final assignableUnits =
+        allUnits.where((u) => u.routeId != widget.route.id).toList();
 
     showDialog(
       context: context,
@@ -42,16 +45,19 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
         return AlertDialog(
           title: Text(
             'Asignar Unidad a Ruta',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
+            style:
+                GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           content: SizedBox(
             width: double.maxFinite,
             child: assignableUnits.isEmpty
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.bus_alert_rounded, size: 48, color: Colors.grey),
+                      const Icon(Icons.bus_alert_rounded,
+                          size: 48, color: Colors.grey),
                       const SizedBox(height: 16),
                       Text(
                         'No hay otras unidades en la cooperativa para asignar.',
@@ -66,24 +72,33 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
                     itemBuilder: (context, index) {
                       final unit = assignableUnits[index];
                       final currentRouteName = unit.routeId != null
-                          ? dataProvider.routes.firstWhere(
-                              (r) => r.id == unit.routeId,
-                              orElse: () => widget.route, // fallback
-                            ).name
+                          ? dataProvider.routes
+                              .firstWhere(
+                                (r) => r.id == unit.routeId,
+                                orElse: () => widget.route, // fallback
+                              )
+                              .name
                           : 'Ninguna';
 
                       return ListTile(
                         leading: CircleAvatar(
                           backgroundColor: Colors.orange.shade100,
-                          child: Icon(Icons.directions_bus, color: Colors.orange.shade800),
+                          child: Icon(Icons.directions_bus,
+                              color: Colors.orange.shade800),
                         ),
-                        title: Text('Unidad ${unit.unitNumber}', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-                        subtitle: Text('Placa: ${unit.plate}\nRuta actual: $currentRouteName'),
+                        title: Text('Unidad ${unit.unitNumber}',
+                            style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600)),
+                        subtitle: Text(
+                            'Placa: ${unit.plate}\nRuta actual: $currentRouteName'),
                         onTap: () {
-                          dataProvider.assignRouteToUnit(unit.id, widget.route.id);
+                          dataProvider.assignRouteToUnit(
+                              unit.id, widget.route.id);
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Unidad ${unit.unitNumber} asignada a la ruta')),
+                            SnackBar(
+                                content: Text(
+                                    'Unidad ${unit.unitNumber} asignada a la ruta')),
                           );
                         },
                       );
@@ -104,9 +119,9 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
   @override
   Widget build(BuildContext context) {
     final stops = widget.route.stops;
-    final center = stops.isNotEmpty 
-      ? LatLng(stops.first.latitude, stops.first.longitude)
-      : const LatLng(-0.1807, -78.4678);
+    final center = stops.isNotEmpty
+        ? LatLng(stops.first.latitude, stops.first.longitude)
+        : const LatLng(-0.1807, -78.4678);
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -144,7 +159,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
               ],
             ),
           ),
-          
+
           // Tab 2: Units List
           _buildUnitsTab(context),
         ],
@@ -173,25 +188,28 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            _buildDetailItem(Icons.location_on, 'Origen', widget.route.origin, Colors.green.shade700),
+            _buildDetailItem(Icons.location_on, 'Origen', widget.route.origin,
+                Colors.green.shade700),
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 12.0),
               child: Divider(),
             ),
-            _buildDetailItem(Icons.flag, 'Destino', widget.route.destination, Colors.red.shade700),
+            _buildDetailItem(Icons.flag, 'Destino', widget.route.destination,
+                Colors.red.shade700),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDetailItem(IconData icon, String label, String value, Color color) {
+  Widget _buildDetailItem(
+      IconData icon, String label, String value, Color color) {
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: color, size: 24),
@@ -201,8 +219,14 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
-              Text(value, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+              Text(label,
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500)),
+              Text(value,
+                  style: GoogleFonts.poppins(
+                      fontSize: 16, fontWeight: FontWeight.w600)),
             ],
           ),
         ),
@@ -218,7 +242,8 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
         children: [
           Text(
             'Recorrido de la Ruta',
-            style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+            style:
+                GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 12),
           ClipRRect(
@@ -235,14 +260,17 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
                 ),
                 children: [
                   TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                     userAgentPackageName: 'com.tesis.admin',
                   ),
                   if (stops.isNotEmpty)
                     PolylineLayer(
                       polylines: [
                         Polyline(
-                          points: stops.map((s) => LatLng(s.latitude, s.longitude)).toList(),
+                          points: stops
+                              .map((s) => LatLng(s.latitude, s.longitude))
+                              .toList(),
                           color: Colors.green.shade700,
                           strokeWidth: 4.0,
                         ),
@@ -257,8 +285,16 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
                         width: 30,
                         height: 30,
                         child: Icon(
-                          index == 0 ? Icons.location_on : (index == stops.length - 1 ? Icons.flag : Icons.circle),
-                          color: index == 0 ? Colors.green : (index == stops.length - 1 ? Colors.red : Colors.orange),
+                          index == 0
+                              ? Icons.location_on
+                              : (index == stops.length - 1
+                                  ? Icons.flag
+                                  : Icons.circle),
+                          color: index == 0
+                              ? Colors.green
+                              : (index == stops.length - 1
+                                  ? Colors.red
+                                  : Colors.orange),
                           size: 30,
                         ),
                       );
@@ -281,11 +317,13 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
         children: [
           Text(
             'Paradas (${stops.length})',
-            style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+            style:
+                GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 12),
           if (stops.isEmpty)
-            Text('No hay paradas registradas para esta ruta.', style: TextStyle(color: Colors.grey.shade600))
+            Text('No hay paradas registradas para esta ruta.',
+                style: TextStyle(color: Colors.grey.shade600))
           else
             ListView.builder(
               shrinkWrap: true,
@@ -302,7 +340,11 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
                             width: 12,
                             height: 12,
                             decoration: BoxDecoration(
-                              color: index == 0 ? Colors.green : (index == stops.length - 1 ? Colors.red : Colors.orange),
+                              color: index == 0
+                                  ? Colors.green
+                                  : (index == stops.length - 1
+                                      ? Colors.red
+                                      : Colors.orange),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -322,10 +364,14 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(stop.name, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 15)),
+                              Text(stop.name,
+                                  style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15)),
                               Text(
                                 '${stop.latitude.toStringAsFixed(6)}, ${stop.longitude.toStringAsFixed(6)}',
-                                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.grey.shade600),
                               ),
                             ],
                           ),
@@ -351,13 +397,18 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.directions_bus_outlined, size: 80, color: Colors.grey.shade300),
+                Icon(Icons.directions_bus_outlined,
+                    size: 80, color: Colors.grey.shade300),
                 const SizedBox(height: 16),
                 Text(
                   'No hay unidades asignadas',
-                  style: GoogleFonts.poppins(fontSize: 18, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                  style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500),
                 ),
-                Text('Asigna una unidad con el botón +', style: TextStyle(color: Colors.grey.shade500)),
+                Text('Asigna una unidad con el botón +',
+                    style: TextStyle(color: Colors.grey.shade500)),
               ],
             ),
           );
@@ -368,8 +419,11 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> with SingleTicker
           padding: const EdgeInsets.all(16),
           itemBuilder: (context, index) {
             final unit = units[index];
-            final matchingDrivers = dataProvider.drivers.where((d) => d.id == unit.driverId);
-            final driverName = matchingDrivers.isNotEmpty ? '${matchingDrivers.first.name} ${matchingDrivers.first.lastName}' : null;
+            final matchingDrivers =
+                dataProvider.drivers.where((d) => d.id == unit.driverId);
+            final driverName = matchingDrivers.isNotEmpty
+                ? '${matchingDrivers.first.name} ${matchingDrivers.first.lastName}'
+                : null;
 
             return TransportUnitCard(
               unit: unit,

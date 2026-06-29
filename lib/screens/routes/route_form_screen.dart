@@ -47,8 +47,8 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
         TextEditingController(text: widget.route?.fare.toString() ?? '');
     _originIdController =
         TextEditingController(text: widget.route?.originId?.toString() ?? '1');
-    _destinationIdController =
-        TextEditingController(text: widget.route?.destinationId?.toString() ?? '2');
+    _destinationIdController = TextEditingController(
+        text: widget.route?.destinationId?.toString() ?? '2');
 
     if (widget.route != null) {
       _stops.addAll(widget.route!.stops);
@@ -106,7 +106,8 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
       builder: (context) {
         final nameController = TextEditingController();
         return AlertDialog(
-          title: Text('Nombre de la Parada', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+          title: Text('Nombre de la Parada',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
           content: TextField(
             controller: nameController,
             decoration: const InputDecoration(
@@ -197,7 +198,8 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Confirmar eliminación', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        title: Text('Confirmar eliminación',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
         content: Text(
             '¿Está seguro de eliminar la ruta "${widget.route!.name}"? Sus unidades dejarán de estar asignadas a esta ruta.'),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -229,7 +231,8 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
 
   void _showAssignUnitDialog(BuildContext context, DataProvider dataProvider) {
     final allUnits = dataProvider.getUnitsByCooperative(widget.cooperativeId);
-    final assignableUnits = allUnits.where((u) => u.routeId != widget.route?.id).toList();
+    final assignableUnits =
+        allUnits.where((u) => u.routeId != widget.route?.id).toList();
 
     showDialog(
       context: context,
@@ -237,16 +240,19 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
         return AlertDialog(
           title: Text(
             'Asignar Unidad a Ruta',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
+            style:
+                GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           content: SizedBox(
             width: double.maxFinite,
             child: assignableUnits.isEmpty
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.bus_alert_rounded, size: 48, color: Colors.grey),
+                      const Icon(Icons.bus_alert_rounded,
+                          size: 48, color: Colors.grey),
                       const SizedBox(height: 16),
                       Text(
                         'No hay otras unidades en la cooperativa para asignar.',
@@ -261,26 +267,34 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                     itemBuilder: (context, index) {
                       final unit = assignableUnits[index];
                       final currentRouteName = unit.routeId != null
-                          ? dataProvider.routes.firstWhere(
-                              (r) => r.id == unit.routeId,
-                              orElse: () => widget.route!, // fallback
-                            ).name
+                          ? dataProvider.routes
+                              .firstWhere(
+                                (r) => r.id == unit.routeId,
+                                orElse: () => widget.route!, // fallback
+                              )
+                              .name
                           : 'Ninguna';
 
                       return ListTile(
                         leading: CircleAvatar(
                           backgroundColor: Colors.orange.shade100,
-                          child: Icon(Icons.directions_bus, color: Colors.orange.shade800),
+                          child: Icon(Icons.directions_bus,
+                              color: Colors.orange.shade800),
                         ),
-                        title: Text('Unidad ${unit.unitNumber}', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-                        subtitle: Text('Placa: ${unit.plate}\nRuta actual: $currentRouteName'),
+                        title: Text('Unidad ${unit.unitNumber}',
+                            style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600)),
+                        subtitle: Text(
+                            'Placa: ${unit.plate}\nRuta actual: $currentRouteName'),
                         onTap: () async {
-                          dataProvider.assignRouteToUnit(unit.id, widget.route!.id);
+                          dataProvider.assignRouteToUnit(
+                              unit.id, widget.route!.id);
 
                           // --- Crear Viaje al asignar unidad a ruta ---
                           final ahora = DateTime.now();
                           // fecha_final absurda para pruebas: 99 años en el futuro
-                          final fechaFinalPrueba = ahora.add(const Duration(days: 36159));
+                          final fechaFinalPrueba =
+                              ahora.add(const Duration(days: 36159));
 
                           // Coordenadas: primera parada de la ruta o valores por defecto
                           double lat = 10.4806;
@@ -304,7 +318,9 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                           if (!ctx.mounted || !context.mounted) return;
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Unidad ${unit.unitNumber} asignada a la ruta y viaje creado')),
+                            SnackBar(
+                                content: Text(
+                                    'Unidad ${unit.unitNumber} asignada a la ruta y viaje creado')),
                           );
                         },
                       );
@@ -352,7 +368,8 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    _buildSectionTitle('Información General', Icons.info_outline),
+                    _buildSectionTitle(
+                        'Información General', Icons.info_outline),
                     const SizedBox(height: 12),
                     Card(
                       elevation: 0,
@@ -369,28 +386,32 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                               label: 'Número de Ruta (Ej: RUT-001)',
                               icon: Icons.numbers,
                               enabled: !isEditing,
-                              validator: (v) => v?.isEmpty ?? true ? 'Campo requerido' : null,
+                              validator: (v) =>
+                                  v?.isEmpty ?? true ? 'Campo requerido' : null,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
                               controller: _nameController,
                               label: 'Nombre de la Ruta',
                               icon: Icons.route,
-                              validator: (v) => v?.isEmpty ?? true ? 'Campo requerido' : null,
+                              validator: (v) =>
+                                  v?.isEmpty ?? true ? 'Campo requerido' : null,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
                               controller: _descriptionController,
                               label: 'Descripción de la Ruta',
                               icon: Icons.description_outlined,
-                              validator: (v) => v?.isEmpty ?? true ? 'Campo requerido' : null,
+                              validator: (v) =>
+                                  v?.isEmpty ?? true ? 'Campo requerido' : null,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
                               controller: _fareController,
                               label: 'Tarifa (Ej: 50)',
                               icon: Icons.attach_money,
-                              validator: (v) => v?.isEmpty ?? true ? 'Campo requerido' : null,
+                              validator: (v) =>
+                                  v?.isEmpty ?? true ? 'Campo requerido' : null,
                             ),
                             const SizedBox(height: 16),
                             Row(
@@ -400,7 +421,9 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                                     controller: _originIdController,
                                     label: 'ID Control Origen',
                                     icon: Icons.location_on,
-                                    validator: (v) => v?.isEmpty ?? true ? 'Campo requerido' : null,
+                                    validator: (v) => v?.isEmpty ?? true
+                                        ? 'Campo requerido'
+                                        : null,
                                   ),
                                 ),
                                 const SizedBox(width: 16),
@@ -409,7 +432,9 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                                     controller: _destinationIdController,
                                     label: 'ID Control Destino',
                                     icon: Icons.flag,
-                                    validator: (v) => v?.isEmpty ?? true ? 'Campo requerido' : null,
+                                    validator: (v) => v?.isEmpty ?? true
+                                        ? 'Campo requerido'
+                                        : null,
                                   ),
                                 ),
                               ],
@@ -419,11 +444,13 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    _buildSectionTitle('Paradas de la Ruta', Icons.map_outlined),
+                    _buildSectionTitle(
+                        'Paradas de la Ruta', Icons.map_outlined),
                     const SizedBox(height: 8),
                     Text(
                       'Toca el mapa para agregar una parada',
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                      style:
+                          TextStyle(color: Colors.grey.shade600, fontSize: 13),
                     ),
                     const SizedBox(height: 12),
                     ClipRRect(
@@ -440,11 +467,13 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                               options: MapOptions(
                                 initialCenter: _mapCenter,
                                 initialZoom: 13.0,
-                                onTap: (tapPosition, point) => _addStopAt(point),
+                                onTap: (tapPosition, point) =>
+                                    _addStopAt(point),
                               ),
                               children: [
                                 TileLayer(
-                                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                  urlTemplate:
+                                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                                   userAgentPackageName: 'com.tesis.admin',
                                 ),
                                 MarkerLayer(
@@ -456,12 +485,15 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                                         height: 40,
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            color: Colors.blue.withOpacity(0.3),
+                                            color: Colors.blue
+                                                .withValues(alpha: 0.3),
                                             shape: BoxShape.circle,
-                                            border: Border.all(color: Colors.blue, width: 2),
+                                            border: Border.all(
+                                                color: Colors.blue, width: 2),
                                           ),
                                           child: const Center(
-                                            child: Icon(Icons.my_location, color: Colors.blue, size: 20),
+                                            child: Icon(Icons.my_location,
+                                                color: Colors.blue, size: 20),
                                           ),
                                         ),
                                       ),
@@ -469,25 +501,38 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                                       final index = entry.key;
                                       final stop = entry.value;
                                       return Marker(
-                                        point: LatLng(stop.latitude, stop.longitude),
+                                        point: LatLng(
+                                            stop.latitude, stop.longitude),
                                         width: 80,
                                         height: 80,
                                         child: Column(
                                           children: [
                                             Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 4,
+                                                      vertical: 2),
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
-                                                borderRadius: BorderRadius.circular(4),
-                                                boxShadow: const [BoxShadow(blurRadius: 2, color: Colors.black26)],
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                                boxShadow: const [
+                                                  BoxShadow(
+                                                      blurRadius: 2,
+                                                      color: Colors.black26)
+                                                ],
                                               ),
                                               child: Text(
                                                 '${index + 1}. ${stop.name}',
-                                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                                                style: const TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight:
+                                                        FontWeight.bold),
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
-                                            const Icon(Icons.location_on, color: Colors.red, size: 30),
+                                            const Icon(Icons.location_on,
+                                                color: Colors.red, size: 30),
                                           ],
                                         ),
                                       );
@@ -520,9 +565,11 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                         ),
                         child: Column(
                           children: [
-                            Icon(Icons.add_location_alt_outlined, size: 48, color: Colors.grey.shade400),
+                            Icon(Icons.add_location_alt_outlined,
+                                size: 48, color: Colors.grey.shade400),
                             const SizedBox(height: 8),
-                            Text('Aún no has agregado paradas', style: TextStyle(color: Colors.grey.shade500)),
+                            Text('Aún no has agregado paradas',
+                                style: TextStyle(color: Colors.grey.shade500)),
                           ],
                         ),
                       )
@@ -531,7 +578,8 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: _stops.length,
-                        separatorBuilder: (context, index) => const SizedBox(height: 8),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 8),
                         itemBuilder: (context, index) {
                           final stop = _stops[index];
                           return Card(
@@ -543,16 +591,23 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                             child: ListTile(
                               leading: CircleAvatar(
                                 backgroundColor: Colors.green.shade100,
-                                child: Text('${index + 1}', style: TextStyle(color: Colors.green.shade800, fontWeight: FontWeight.bold)),
+                                child: Text('${index + 1}',
+                                    style: TextStyle(
+                                        color: Colors.green.shade800,
+                                        fontWeight: FontWeight.bold)),
                               ),
-                              title: Text(stop.name, style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
+                              title: Text(stop.name,
+                                  style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.w500)),
                               subtitle: Text(
                                 '${stop.latitude.toStringAsFixed(4)}, ${stop.longitude.toStringAsFixed(4)}',
                                 style: const TextStyle(fontSize: 12),
                               ),
                               trailing: IconButton(
-                                icon: const Icon(Icons.delete_outline, color: Colors.red),
-                                onPressed: () => setState(() => _stops.removeAt(index)),
+                                icon: const Icon(Icons.delete_outline,
+                                    color: Colors.red),
+                                onPressed: () =>
+                                    setState(() => _stops.removeAt(index)),
                               ),
                             ),
                           );
@@ -563,9 +618,11 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _buildSectionTitle('Unidades Asignadas', Icons.directions_bus_outlined),
+                          _buildSectionTitle('Unidades Asignadas',
+                              Icons.directions_bus_outlined),
                           TextButton.icon(
-                            onPressed: () => _showAssignUnitDialog(context, dataProvider),
+                            onPressed: () =>
+                                _showAssignUnitDialog(context, dataProvider),
                             icon: const Icon(Icons.add, size: 18),
                             label: const Text('Asignar'),
                             style: TextButton.styleFrom(
@@ -577,7 +634,8 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                       const SizedBox(height: 12),
                       Builder(
                         builder: (context) {
-                          final List<TransportUnit> routeUnits = dataProvider.getUnitsByRoute(widget.route!.id);
+                          final List<TransportUnit> routeUnits =
+                              dataProvider.getUnitsByRoute(widget.route!.id);
                           if (routeUnits.isEmpty) {
                             return Container(
                               width: double.infinity,
@@ -588,11 +646,14 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                               ),
                               child: Column(
                                 children: [
-                                  Icon(Icons.directions_bus_outlined, size: 40, color: Colors.grey.shade400),
+                                  Icon(Icons.directions_bus_outlined,
+                                      size: 40, color: Colors.grey.shade400),
                                   const SizedBox(height: 8),
                                   Text(
                                     'No hay unidades asignadas a esta ruta',
-                                    style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+                                    style: TextStyle(
+                                        color: Colors.grey.shade500,
+                                        fontSize: 13),
                                   ),
                                 ],
                               ),
@@ -602,7 +663,8 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: routeUnits.length,
-                            separatorBuilder: (context, index) => const SizedBox(height: 8),
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 8),
                             itemBuilder: (context, index) {
                               final unit = routeUnits[index];
                               return Card(
@@ -614,34 +676,47 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                                 child: ListTile(
                                   leading: CircleAvatar(
                                     backgroundColor: Colors.orange.shade100,
-                                    child: Icon(Icons.directions_bus, color: Colors.orange.shade800),
+                                    child: Icon(Icons.directions_bus,
+                                        color: Colors.orange.shade800),
                                   ),
                                   title: Text(
                                     'Unidad ${unit.unitNumber}',
-                                    style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                                    style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.w500),
                                   ),
                                   subtitle: Text('Placa: ${unit.plate}'),
                                   trailing: IconButton(
-                                    icon: const Icon(Icons.link_off, color: Colors.red),
+                                    icon: const Icon(Icons.link_off,
+                                        color: Colors.red),
                                     tooltip: 'Desasignar',
                                     onPressed: () {
                                       showDialog(
                                         context: context,
                                         builder: (ctx) => AlertDialog(
-                                          title: Text('Confirmar desasignación', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-                                          content: Text('¿Está seguro de quitar la unidad "${unit.unitNumber}" de esta ruta?'),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                          title: Text('Confirmar desasignación',
+                                              style: GoogleFonts.poppins(
+                                                  fontWeight: FontWeight.bold)),
+                                          content: Text(
+                                              '¿Está seguro de quitar la unidad "${unit.unitNumber}" de esta ruta?'),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16)),
                                           actions: [
                                             TextButton(
-                                              onPressed: () => Navigator.of(ctx).pop(),
+                                              onPressed: () =>
+                                                  Navigator.of(ctx).pop(),
                                               child: const Text('Cancelar'),
                                             ),
                                             ElevatedButton(
                                               onPressed: () {
-                                                dataProvider.assignRouteToUnit(unit.id, null);
+                                                dataProvider.assignRouteToUnit(
+                                                    unit.id, null);
                                                 Navigator.of(ctx).pop();
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text('Unidad desasignada de la ruta')),
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content: Text(
+                                                          'Unidad desasignada de la ruta')),
                                                 );
                                               },
                                               style: ElevatedButton.styleFrom(
@@ -677,20 +752,29 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
                         elevation: 2,
                       ),
                       child: _isLoading
-                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white))
                           : Text(
                               isEditing ? 'Guardar Cambios' : 'Crear Ruta',
-                              style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+                              style: GoogleFonts.poppins(
+                                  fontSize: 16, fontWeight: FontWeight.w600),
                             ),
                     ),
                     if (isEditing) ...[
                       const SizedBox(height: 16),
                       ElevatedButton.icon(
-                        onPressed: _isLoading ? null : () => _showDeleteRouteDialog(context, dataProvider),
+                        onPressed: _isLoading
+                            ? null
+                            : () =>
+                                _showDeleteRouteDialog(context, dataProvider),
                         icon: const Icon(Icons.delete_outline),
                         label: Text(
                           'Eliminar Ruta',
-                          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+                          style: GoogleFonts.poppins(
+                              fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,

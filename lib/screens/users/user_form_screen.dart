@@ -177,15 +177,16 @@ class _UserFormScreenState extends State<UserFormScreen> {
                             icon: Icons.email,
                             keyboardType: TextInputType.emailAddress,
                             validator: (v) {
-                              if (v == null || v.isEmpty)
+                              if (v == null || v.isEmpty) {
                                 return 'Campo requerido';
+                              }
                               if (!v.contains('@')) return 'Email inválido';
                               return null;
                             },
                           ),
                           const SizedBox(height: 16),
                           DropdownButtonFormField<String>(
-                            value: _selectedRol,
+                            initialValue: _selectedRol,
                             decoration: InputDecoration(
                               labelText: 'Rol',
                               prefixIcon: const Icon(Icons.security,

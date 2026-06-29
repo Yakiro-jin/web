@@ -27,7 +27,7 @@ class CooperativeCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -93,14 +93,16 @@ class CooperativeCard extends StatelessWidget {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.teal.shade50,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.route_rounded, size: 14, color: Colors.teal.shade700),
+                            Icon(Icons.route_rounded,
+                                size: 14, color: Colors.teal.shade700),
                             const SizedBox(width: 6),
                             Text(
                               '$routeCount ${routeCount == 1 ? 'ruta' : 'rutas'}',
@@ -122,7 +124,8 @@ class CooperativeCard extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      Icon(Icons.chevron_right_rounded, size: 16, color: Colors.blue.shade600),
+                      Icon(Icons.chevron_right_rounded,
+                          size: 16, color: Colors.blue.shade600),
                     ],
                   ),
                 ],
