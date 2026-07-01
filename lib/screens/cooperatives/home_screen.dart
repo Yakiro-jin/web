@@ -18,6 +18,9 @@ import 'cooperative_form_screen.dart';
 import 'driver_form_screen.dart';
 import '../units/transport_unit_form_screen.dart';
 
+/// Pantalla principal del panel administrativo.
+/// Esta vista centraliza la gestión de cooperativas, rutas, buses, choferes y usuarios,
+/// además de mostrar un dashboard con viajes activos en un mapa.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -25,6 +28,9 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+/// Estado de la pantalla principal.
+/// Mantiene el control de la pestaña activa, la cooperativa seleccionada y la lógica
+/// de los diálogos, filtros y widgets dinámicos utilizados en la interfaz.
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
@@ -33,11 +39,15 @@ class _HomeScreenState extends State<HomeScreen>
   int _activeTabIndex = 0;
   LatLng? _mapCenterOverride;
 
+  /// Inicializa el estado base de la pantalla antes de construir la UI.
   @override
   void initState() {
     super.initState();
   }
 
+  /// Crea y configura el controlador de pestañas cuando la pantalla lo necesita.
+  /// Este controlador permite cambiar entre los distintos módulos del panel y sincronizar
+  /// el estado visual con el índice de la pestaña seleccionada.
   void _initTabController() {
     if (_tabController == null) {
       _tabController = TabController(length: 5, vsync: this);
@@ -52,12 +62,16 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
+  /// Libera el controlador de pestañas y los recursos asociados al salir de la pantalla.
   @override
   void dispose() {
     _tabController?.dispose();
     super.dispose();
   }
 
+  /// Muestra un cuadro de confirmación antes de borrar una cooperativa.
+  /// El mensaje incluye el nombre de la entidad y advierte que también se eliminarán
+  /// rutas, buses y choferes asociados a esa cooperativa.
   void _showDeleteCooperativeDialog(
       BuildContext context, Cooperative cooperative) {
     showDialog(
@@ -90,6 +104,9 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// Abre un diálogo para cambiar la cooperativa activa.
+  /// Muestra la lista disponible y permite seleccionar otra entidad, actualizando el
+  /// filtro y el contexto de los datos mostrados en la pantalla.
   void _showCooperativeSelectionDialog(
       BuildContext context, DataProvider dataProvider) {
     final cooperatives = dataProvider.cooperatives;
@@ -158,6 +175,8 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// Presenta un diálogo de confirmación antes de eliminar a un chofer.
+  /// También informa que el chofer será desasignado de cualquier unidad que tuviera.
   void _showDeleteDriverDialog(
       BuildContext context, String driverId, String driverName) {
     showDialog(
@@ -193,6 +212,11 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// Construye la interfaz principal del panel administrativo.
+  /// El flujo incluye estados de carga, pantallas vacías, selección de cooperativa y
+  /// la renderización de las pestañas según el tamaño de pantalla.
+  /// Aquí se deciden qué vistas mostrar según la cooperativa activa, si hay datos
+  /// disponibles y si el panel se está visualizando en escritorio o móvil.
   @override
   Widget build(BuildContext context) {
     return Consumer<DataProvider>(
@@ -628,6 +652,9 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// Construye la vista de rutas para la cooperativa seleccionada.
+  /// Obtiene las rutas asociadas, verifica si hay contenido y muestra tarjetas con la
+  /// información relevante y la posibilidad de editar cada ruta.
   Widget _buildRoutesTab(DataProvider dataProvider, Cooperative cooperative) {
     final routes = dataProvider.getRoutesByCooperative(cooperative.id);
     final isDesktop = MediaQuery.of(context).size.width > 900;
@@ -722,6 +749,9 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// Construye la vista de buses o unidades de transporte.
+  /// Reúne las unidades de la cooperativa, resuelve el nombre del chofer asignado y
+  /// muestra una tarjeta por cada bus para permitir su edición o revisión rápida.
   Widget _buildBusesTab(DataProvider dataProvider, Cooperative cooperative) {
     final units = dataProvider.getUnitsByCooperative(cooperative.id);
     final isDesktop = MediaQuery.of(context).size.width > 900;
@@ -802,6 +832,9 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// Construye la vista de choferes para la cooperativa activa.
+  /// Muestra una tarjeta con los datos personales del chofer y ofrece acciones de edición
+  /// o eliminación desde un menú contextual.
   Widget _buildDriversTab(DataProvider dataProvider, Cooperative cooperative) {
     final drivers = dataProvider.getDriversByCooperative(cooperative.id);
     final isDesktop = MediaQuery.of(context).size.width > 900;
@@ -988,6 +1021,8 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// Construye la vista de usuarios del sistema.
+  /// Muestra los usuarios registrados con su rol y datos básicos, y permite editarlos o eliminarlos.
   Widget _buildUsersTab(DataProvider dataProvider) {
     final users = dataProvider.systemUsers;
     final isDesktop = MediaQuery.of(context).size.width > 900;
@@ -1139,6 +1174,8 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// Muestra un cuadro de confirmación para borrar un usuario del sistema.
+  /// Se utiliza para evitar eliminaciones accidentales y aportar una confirmación visual.
   void _showDeleteUserDialog(BuildContext context, SystemUser user) {
     showDialog(
       context: context,
@@ -1173,6 +1210,8 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// Define el botón flotante según la pestaña activa.
+  /// Cada pestaña tiene un acción distinta: crear rutas, buses, choferes o usuarios.
   Widget? _buildFAB(Cooperative cooperative) {
     if (_activeTabIndex == 0) {
       return null;
@@ -1243,6 +1282,8 @@ class _HomeScreenState extends State<HomeScreen>
     return null;
   }
 
+  /// Abre una hoja inferior con los detalles de un viaje activo.
+  /// Se usa para mostrar información del viaje, ruta asignada, conductor, coordenadas y estado.
   void _showViajeBottomSheet(
     BuildContext context,
     Viaje viaje,
@@ -1386,6 +1427,8 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// Crea una fila reutilizable para mostrar atributos en la hoja de detalle del viaje.
+  /// Sirve para presentar la información de forma consistente y ordenada.
   Widget _buildDetailRow(IconData icon, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -1419,6 +1462,9 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// Construye el tablero principal con el mapa y la lista de unidades activas.
+  /// Filtra los viajes por cooperativa y por ruta, genera los marcadores del mapa y
+  /// permite interactuar con cada unidad para ver más información.
   Widget _buildDashboardTab(
       DataProvider dataProvider, Cooperative cooperative) {
     final routes = dataProvider.getRoutesByCooperative(cooperative.id);
@@ -1799,6 +1845,8 @@ class _HomeScreenState extends State<HomeScreen>
   }
 }
 
+/// Widget reutilizable que muestra un mapa interactivo con marcadores.
+/// Se encarga de renderizar el mapa usando Flutter Map y de mover la vista al centro indicado.
 class DashboardMap extends StatefulWidget {
   final LatLng center;
   final List<Marker> markers;
@@ -1813,6 +1861,8 @@ class DashboardMap extends StatefulWidget {
   State<DashboardMap> createState() => _DashboardMapState();
 }
 
+/// Estado interno del mapa.
+/// Mantiene el controlador del mapa y actualiza la vista cuando cambia el centro.
 class _DashboardMapState extends State<DashboardMap> {
   late final MapController _mapController;
 
@@ -1822,6 +1872,8 @@ class _DashboardMapState extends State<DashboardMap> {
     _mapController = MapController();
   }
 
+  /// Reacciona a cambios en el centro del mapa.
+  /// Cuando la posición objetivo cambia, la vista se desplaza para mostrarla.
   @override
   void didUpdateWidget(covariant DashboardMap oldWidget) {
     super.didUpdateWidget(oldWidget);

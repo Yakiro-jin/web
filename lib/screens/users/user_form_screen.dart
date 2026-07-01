@@ -6,6 +6,9 @@ import 'package:uuid/uuid.dart';
 import '../../models/system_user.dart';
 import '../../providers/data_provider.dart';
 
+/// Formulario para crear o editar un usuario del sistema.
+/// Recopila datos personales, rol, correo y contraseña, permitiendo administrar
+/// los accesos del panel de gestión de forma centralizada.
 class UserFormScreen extends StatefulWidget {
   final SystemUser? user;
 
@@ -56,6 +59,8 @@ class _UserFormScreenState extends State<UserFormScreen> {
     super.dispose();
   }
 
+  /// Guarda un usuario nuevo o actualiza uno existente tras validar el formulario.
+  /// El método prepara el objeto de usuario y lo envía al provider para persistirlo.
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -108,6 +113,8 @@ class _UserFormScreenState extends State<UserFormScreen> {
     );
   }
 
+  /// Construye la interfaz del formulario de usuarios con campos claros y un botón de acción.
+  /// Se organiza para capturar información básica del usuario y su rol dentro del sistema.
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.user != null;

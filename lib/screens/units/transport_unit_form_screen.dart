@@ -7,6 +7,9 @@ import '../../models/driver.dart';
 import '../../models/route.dart';
 import '../../providers/data_provider.dart';
 
+/// Formulario para crear o editar una unidad de transporte.
+/// Permite registrar la placa, el modelo, el color, el año de fabricación y luego
+/// gestionar la asignación de choferes y rutas desde la misma pantalla.
 class TransportUnitFormScreen extends StatefulWidget {
   final String cooperativeId;
   final TransportUnit? unit;
@@ -36,7 +39,7 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
     _plateController = TextEditingController(text: widget.unit?.plate ?? '');
     _modelController = TextEditingController(text: widget.unit?.model ?? '');
     _colorController = TextEditingController(text: widget.unit?.color ?? '');
-    
+
     String initialYear = '';
     if (widget.unit != null && widget.unit!.yearOfManufacture.isNotEmpty) {
       try {
@@ -58,13 +61,15 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
     super.dispose();
   }
 
+  /// Guarda los datos de la unidad de transporte tras validar el formulario.
+  /// Si la unidad es nueva, la crea; si ya existe, la actualiza conservando sus asignaciones.
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     final dataProvider = context.read<DataProvider>();
-    
+
     // Format year as ISO date string: YYYY-01-01T00:00:00.000Z
     final yearVal = _yearController.text.trim();
     final isoDateStr = '$yearVal-01-01T00:00:00.000Z';
@@ -103,14 +108,17 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
     );
   }
 
-  // Muestra un diálogo de confirmación antes de eliminar el bus/unidad.
-  // Llama a dataProvider.deleteTransportUnit y luego regresa a la pantalla anterior.
+  /// Muestra un diálogo de confirmación antes de eliminar la unidad.
+  /// Se encarga de informar al usuario del impacto de esta acción y luego
+  /// delega la eliminación al provider correspondiente.
   void _showDeleteUnitDialog(BuildContext context, DataProvider dataProvider) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Confirmar eliminación', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-        content: Text('¿Está seguro de eliminar la unidad "${widget.unit!.plate}"?'),
+        title: Text('Confirmar eliminación',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        content:
+            Text('¿Está seguro de eliminar la unidad "${widget.unit!.plate}"?'),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         actions: [
           TextButton(
@@ -138,9 +146,10 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
     );
   }
 
-  // Muestra un diálogo con los choferes registrados en la cooperativa actual.
-  // Permite al usuario seleccionar un chofer para asignarlo a esta unidad de transporte.
-  void _showDriverSelectionDialog(BuildContext context, DataProvider dataProvider) {
+  /// Muestra un diálogo con los choferes registrados en la cooperativa actual.
+  /// Permite seleccionar uno y asignarlo a la unidad de transporte desde la misma vista.
+  void _showDriverSelectionDialog(
+      BuildContext context, DataProvider dataProvider) {
     final drivers = dataProvider.getDriversByCooperative(widget.cooperativeId);
 
     showDialog(
@@ -149,16 +158,19 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
         return AlertDialog(
           title: Text(
             'Asignar Chofer a Unidad ${widget.unit!.plate}',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
+            style:
+                GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           content: SizedBox(
             width: double.maxFinite,
             child: drivers.isEmpty
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.person_off_rounded, size: 48, color: Colors.grey),
+                      const Icon(Icons.person_off_rounded,
+                          size: 48, color: Colors.grey),
                       const SizedBox(height: 16),
                       Text(
                         'No hay choferes registrados en esta cooperativa.',
@@ -172,7 +184,7 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                     itemCount: drivers.length,
                     itemBuilder: (context, index) {
                       final driver = drivers[index];
-                      
+
                       // Buscamos la versión más actualizada de la unidad desde el dataProvider reactivo
                       final currentUnitState = dataProvider.units.firstWhere(
                         (u) => u.id == widget.unit!.id,
@@ -182,26 +194,37 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
 
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: isCurrent ? Colors.green.shade100 : Colors.grey.shade100,
+                          backgroundColor: isCurrent
+                              ? Colors.green.shade100
+                              : Colors.grey.shade100,
                           child: Icon(
                             Icons.person,
-                            color: isCurrent ? Colors.green.shade800 : Colors.grey.shade700,
+                            color: isCurrent
+                                ? Colors.green.shade800
+                                : Colors.grey.shade700,
                           ),
                         ),
                         title: Text(
                           '${driver.name} ${driver.lastName}',
                           style: GoogleFonts.poppins(
-                            fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                            fontWeight:
+                                isCurrent ? FontWeight.bold : FontWeight.normal,
                           ),
                         ),
                         subtitle: Text('Telf: ${driver.phone}'),
-                        trailing: isCurrent ? const Icon(Icons.check_circle, color: Colors.green) : null,
+                        trailing: isCurrent
+                            ? const Icon(Icons.check_circle,
+                                color: Colors.green)
+                            : null,
                         onTap: () {
                           // Asignamos el chofer a la unidad usando el provider
-                          dataProvider.assignDriverToUnit(widget.unit!.id, driver.id);
+                          dataProvider.assignDriverToUnit(
+                              widget.unit!.id, driver.id);
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Chofer ${driver.name} asignado')),
+                            SnackBar(
+                                content:
+                                    Text('Chofer ${driver.name} asignado')),
                           );
                         },
                       );
@@ -219,8 +242,10 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
     );
   }
 
-  // Muestra un diálogo con las rutas de la cooperativa actual para asignarla a la unidad.
-  void _showRouteSelectionDialog(BuildContext context, DataProvider dataProvider) {
+  /// Muestra un diálogo con las rutas disponibles para la cooperativa.
+  /// Esto permite asignar una ruta a la unidad y, además, iniciar el seguimiento del viaje.
+  void _showRouteSelectionDialog(
+      BuildContext context, DataProvider dataProvider) {
     final routes = dataProvider.getRoutesByCooperative(widget.cooperativeId);
 
     showDialog(
@@ -229,16 +254,19 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
         return AlertDialog(
           title: Text(
             'Asignar Ruta a Unidad ${widget.unit!.plate}',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
+            style:
+                GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           content: SizedBox(
             width: double.maxFinite,
             child: routes.isEmpty
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.route_outlined, size: 48, color: Colors.grey),
+                      const Icon(Icons.route_outlined,
+                          size: 48, color: Colors.grey),
                       const SizedBox(height: 16),
                       Text(
                         'No hay rutas registradas en esta cooperativa.',
@@ -252,7 +280,7 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                     itemCount: routes.length,
                     itemBuilder: (context, index) {
                       final route = routes[index];
-                      
+
                       final currentUnitState = dataProvider.units.firstWhere(
                         (u) => u.id == widget.unit!.id,
                         orElse: () => widget.unit!,
@@ -261,26 +289,37 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
 
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: isCurrent ? Colors.green.shade100 : Colors.grey.shade100,
+                          backgroundColor: isCurrent
+                              ? Colors.green.shade100
+                              : Colors.grey.shade100,
                           child: Icon(
                             Icons.route,
-                            color: isCurrent ? Colors.green.shade800 : Colors.grey.shade700,
+                            color: isCurrent
+                                ? Colors.green.shade800
+                                : Colors.grey.shade700,
                           ),
                         ),
                         title: Text(
                           route.name,
                           style: GoogleFonts.poppins(
-                            fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                            fontWeight:
+                                isCurrent ? FontWeight.bold : FontWeight.normal,
                           ),
                         ),
-                        subtitle: Text('${route.origin} → ${route.destination}'),
-                        trailing: isCurrent ? const Icon(Icons.check_circle, color: Colors.green) : null,
+                        subtitle:
+                            Text('${route.origin} → ${route.destination}'),
+                        trailing: isCurrent
+                            ? const Icon(Icons.check_circle,
+                                color: Colors.green)
+                            : null,
                         onTap: () async {
-                          dataProvider.assignRouteToUnit(widget.unit!.id, route.id);
-                          
+                          dataProvider.assignRouteToUnit(
+                              widget.unit!.id, route.id);
+
                           // --- Crear Viaje al asignar ruta a unidad ---
                           final ahora = DateTime.now();
-                          final fechaFinalPrueba = ahora.add(const Duration(days: 36159));
+                          final fechaFinalPrueba =
+                              ahora.add(const Duration(days: 36159));
                           double lat = 10.4806;
                           double lng = -66.9036;
                           if (route.stops.isNotEmpty) {
@@ -301,7 +340,9 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                           if (!ctx.mounted || !context.mounted) return;
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Unidad asignada a ruta y viaje creado')),
+                            SnackBar(
+                                content: Text(
+                                    'Unidad asignada a ruta y viaje creado')),
                           );
                         },
                       );
@@ -319,6 +360,9 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
     );
   }
 
+  /// Construye la vista completa de la unidad de transporte.
+  /// Incluye sus datos principales, la gestión de chofer asignado y la ruta relacionada,
+  /// ofreciendo una experiencia centralizada para administrar el vehículo.
   @override
   Widget build(BuildContext context) {
     // Obtenemos DataProvider de forma reactiva para actualizar la UI en cambios de asignación o borrado
@@ -347,7 +391,8 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildSectionTitle('Detalles del Vehículo', Icons.directions_bus),
+                    _buildSectionTitle(
+                        'Detalles del Vehículo', Icons.directions_bus),
                     const SizedBox(height: 12),
                     Card(
                       elevation: 0,
@@ -365,21 +410,24 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                               icon: Icons.badge,
                               enabled: !isEditing,
                               capitalization: TextCapitalization.characters,
-                              validator: (v) => v?.isEmpty ?? true ? 'Campo requerido' : null,
+                              validator: (v) =>
+                                  v?.isEmpty ?? true ? 'Campo requerido' : null,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
                               controller: _modelController,
                               label: 'Modelo (Ej: Toyota HiAce)',
                               icon: Icons.directions_car,
-                              validator: (v) => v?.isEmpty ?? true ? 'Campo requerido' : null,
+                              validator: (v) =>
+                                  v?.isEmpty ?? true ? 'Campo requerido' : null,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
                               controller: _colorController,
                               label: 'Color',
                               icon: Icons.color_lens_outlined,
-                              validator: (v) => v?.isEmpty ?? true ? 'Campo requerido' : null,
+                              validator: (v) =>
+                                  v?.isEmpty ?? true ? 'Campo requerido' : null,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
@@ -387,11 +435,17 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                               label: 'Año de Fabricación (Ej: 2020)',
                               icon: Icons.calendar_today,
                               keyboardType: TextInputType.number,
-                              formatters: [FilteringTextInputFormatter.digitsOnly],
+                              formatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
                               validator: (v) {
-                                if (v == null || v.isEmpty) return 'Campo requerido';
+                                if (v == null || v.isEmpty) {
+                                  return 'Campo requerido';
+                                }
                                 final n = int.tryParse(v);
-                                if (n == null || n < 1900 || n > DateTime.now().year + 1) {
+                                if (n == null ||
+                                    n < 1900 ||
+                                    n > DateTime.now().year + 1) {
                                   return 'Ingrese un año válido';
                                 }
                                 return null;
@@ -408,10 +462,12 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _buildSectionTitle('Chofer Asignado', Icons.person_outline),
+                          _buildSectionTitle(
+                              'Chofer Asignado', Icons.person_outline),
                           // Botón para asignar un chofer abriendo el diálogo de selección
                           TextButton.icon(
-                            onPressed: () => _showDriverSelectionDialog(context, dataProvider),
+                            onPressed: () => _showDriverSelectionDialog(
+                                context, dataProvider),
                             icon: const Icon(Icons.add, size: 18),
                             label: const Text('Asignar'),
                             style: TextButton.styleFrom(
@@ -429,9 +485,10 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                             (u) => u.id == widget.unit!.id,
                             orElse: () => widget.unit!,
                           );
-                          
+
                           // Si no hay un chofer asignado, mostramos una advertencia visual bonita
-                          if (currentUnit.driverId == null || currentUnit.driverId!.isEmpty) {
+                          if (currentUnit.driverId == null ||
+                              currentUnit.driverId!.isEmpty) {
                             return Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(20),
@@ -441,11 +498,15 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                               ),
                               child: Column(
                                 children: [
-                                  Icon(Icons.person_off_outlined, size: 40, color: Colors.grey.shade400),
+                                  Icon(Icons.person_off_outlined,
+                                      size: 40, color: Colors.grey.shade400),
                                   const SizedBox(height: 8),
                                   Text(
                                     'Sin chofer asignado',
-                                    style: TextStyle(color: Colors.red.shade400, fontSize: 14, fontWeight: FontWeight.w500),
+                                    style: TextStyle(
+                                        color: Colors.red.shade400,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500),
                                   ),
                                 ],
                               ),
@@ -477,36 +538,49 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                             child: ListTile(
                               leading: CircleAvatar(
                                 backgroundColor: Colors.green.shade100,
-                                child: Icon(Icons.person, color: Colors.green.shade800),
+                                child: Icon(Icons.person,
+                                    color: Colors.green.shade800),
                               ),
                               title: Text(
                                 '${driver.name} ${driver.lastName}',
-                                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                                style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w500),
                               ),
                               subtitle: Text('Telf: ${driver.phone}'),
                               trailing: IconButton(
-                                icon: const Icon(Icons.person_remove, color: Colors.red),
+                                icon: const Icon(Icons.person_remove,
+                                    color: Colors.red),
                                 tooltip: 'Quitar Chofer',
                                 onPressed: () {
                                   // Diálogo de confirmación antes de desasignar al chofer del bus
                                   showDialog(
                                     context: context,
                                     builder: (ctx) => AlertDialog(
-                                      title: Text('Confirmar desasignación', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-                                      content: Text('¿Está seguro de quitar al chofer "${driver.name}" de esta unidad?'),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                      title: Text('Confirmar desasignación',
+                                          style: GoogleFonts.poppins(
+                                              fontWeight: FontWeight.bold)),
+                                      content: Text(
+                                          '¿Está seguro de quitar al chofer "${driver.name}" de esta unidad?'),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16)),
                                       actions: [
                                         TextButton(
-                                          onPressed: () => Navigator.of(ctx).pop(),
+                                          onPressed: () =>
+                                              Navigator.of(ctx).pop(),
                                           child: const Text('Cancelar'),
                                         ),
                                         ElevatedButton(
                                           onPressed: () {
                                             // Desasignamos al chofer pasando null como driverId
-                                            dataProvider.assignDriverToUnit(widget.unit!.id, null);
+                                            dataProvider.assignDriverToUnit(
+                                                widget.unit!.id, null);
                                             Navigator.of(ctx).pop();
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Chofer desasignado de la unidad')),
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                  content: Text(
+                                                      'Chofer desasignado de la unidad')),
                                             );
                                           },
                                           style: ElevatedButton.styleFrom(
@@ -530,9 +604,11 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _buildSectionTitle('Ruta Asignada', Icons.route_outlined),
+                          _buildSectionTitle(
+                              'Ruta Asignada', Icons.route_outlined),
                           TextButton.icon(
-                            onPressed: () => _showRouteSelectionDialog(context, dataProvider),
+                            onPressed: () => _showRouteSelectionDialog(
+                                context, dataProvider),
                             icon: const Icon(Icons.add, size: 18),
                             label: const Text('Asignar'),
                             style: TextButton.styleFrom(
@@ -548,8 +624,9 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                             (u) => u.id == widget.unit!.id,
                             orElse: () => widget.unit!,
                           );
-                          
-                          if (currentUnit.routeId == null || currentUnit.routeId!.isEmpty) {
+
+                          if (currentUnit.routeId == null ||
+                              currentUnit.routeId!.isEmpty) {
                             return Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(20),
@@ -559,11 +636,15 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                               ),
                               child: Column(
                                 children: [
-                                  Icon(Icons.route_outlined, size: 40, color: Colors.grey.shade400),
+                                  Icon(Icons.route_outlined,
+                                      size: 40, color: Colors.grey.shade400),
                                   const SizedBox(height: 8),
                                   Text(
                                     'Sin ruta asignada',
-                                    style: TextStyle(color: Colors.red.shade400, fontSize: 14, fontWeight: FontWeight.w500),
+                                    style: TextStyle(
+                                        color: Colors.red.shade400,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500),
                                   ),
                                 ],
                               ),
@@ -595,34 +676,48 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                             child: ListTile(
                               leading: CircleAvatar(
                                 backgroundColor: Colors.orange.shade100,
-                                child: Icon(Icons.route, color: Colors.orange.shade800),
+                                child: Icon(Icons.route,
+                                    color: Colors.orange.shade800),
                               ),
                               title: Text(
                                 route.name,
-                                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                                style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w500),
                               ),
-                              subtitle: Text('${route.origin} → ${route.destination}'),
+                              subtitle: Text(
+                                  '${route.origin} → ${route.destination}'),
                               trailing: IconButton(
-                                icon: const Icon(Icons.link_off, color: Colors.red),
+                                icon: const Icon(Icons.link_off,
+                                    color: Colors.red),
                                 tooltip: 'Quitar Ruta',
                                 onPressed: () {
                                   showDialog(
                                     context: context,
                                     builder: (ctx) => AlertDialog(
-                                      title: Text('Confirmar desasignación', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-                                      content: Text('¿Está seguro de quitar la ruta "${route.name}" de esta unidad?'),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                      title: Text('Confirmar desasignación',
+                                          style: GoogleFonts.poppins(
+                                              fontWeight: FontWeight.bold)),
+                                      content: Text(
+                                          '¿Está seguro de quitar la ruta "${route.name}" de esta unidad?'),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16)),
                                       actions: [
                                         TextButton(
-                                          onPressed: () => Navigator.of(ctx).pop(),
+                                          onPressed: () =>
+                                              Navigator.of(ctx).pop(),
                                           child: const Text('Cancelar'),
                                         ),
                                         ElevatedButton(
                                           onPressed: () {
-                                            dataProvider.assignRouteToUnit(widget.unit!.id, null);
+                                            dataProvider.assignRouteToUnit(
+                                                widget.unit!.id, null);
                                             Navigator.of(ctx).pop();
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Ruta desasignada de la unidad')),
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                  content: Text(
+                                                      'Ruta desasignada de la unidad')),
                                             );
                                           },
                                           style: ElevatedButton.styleFrom(
@@ -656,21 +751,30 @@ class _TransportUnitFormScreenState extends State<TransportUnitFormScreen> {
                         elevation: 2,
                       ),
                       child: _isLoading
-                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white))
                           : Text(
                               isEditing ? 'Actualizar Unidad' : 'Crear Unidad',
-                              style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+                              style: GoogleFonts.poppins(
+                                  fontSize: 16, fontWeight: FontWeight.w600),
                             ),
                     ),
                     // Si estamos editando, mostramos el botón Eliminar en rojo al final de toda la pantalla
                     if (isEditing) ...[
                       const SizedBox(height: 16),
                       ElevatedButton.icon(
-                        onPressed: _isLoading ? null : () => _showDeleteUnitDialog(context, dataProvider),
+                        onPressed: _isLoading
+                            ? null
+                            : () =>
+                                _showDeleteUnitDialog(context, dataProvider),
                         icon: const Icon(Icons.delete_outline),
                         label: Text(
                           'Eliminar Unidad',
-                          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+                          style: GoogleFonts.poppins(
+                              fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,

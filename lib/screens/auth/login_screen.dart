@@ -3,6 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 
+/// Pantalla de acceso al sistema administrativo.
+/// Este formulario permite autenticar a un usuario con cédula y contraseña,
+/// recordar la sesión si corresponde y mostrar mensajes claros de error cuando
+/// las credenciales ingresadas no son válidas.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -24,6 +28,9 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  /// Ejecuta la autenticación del usuario usando el provider de autenticación.
+  /// Valida primero los campos del formulario, envía las credenciales al backend
+  /// y muestra un mensaje de error cuando el inicio de sesión falla.
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -50,6 +57,9 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = false);
   }
 
+  /// Construye la interfaz visual del login con un diseño tipo panel moderno.
+  /// Se organiza con un fondo degradado, una tarjeta central y los campos
+  /// necesarios para que el usuario ingrese sus credenciales de manera clara.
   @override
   Widget build(BuildContext context) {
     return Scaffold(

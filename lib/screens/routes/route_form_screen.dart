@@ -8,6 +8,9 @@ import '../../models/route.dart';
 import '../../models/transport_unit.dart';
 import '../../providers/data_provider.dart';
 
+/// Formulario para crear o editar una ruta de transporte.
+/// Permite definir información básica, agregar paradas sobre un mapa, asignar
+/// unidades y guardar el recorrido completo con validaciones de negocio.
 class RouteFormScreen extends StatefulWidget {
   final String cooperativeId;
   final TransportRoute? route;
@@ -59,6 +62,9 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
     _getCurrentLocation();
   }
 
+  /// Intenta obtener la ubicación actual del dispositivo para centrar el mapa.
+  /// Si el permiso de geolocalización no está disponible, la vista conserva
+  /// la posición por defecto y sigue funcionando normalmente.
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -100,6 +106,8 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
     super.dispose();
   }
 
+  /// Abre un diálogo para capturar el nombre de una parada nueva.
+  /// Se utiliza al tocar el mapa, permitiendo que el usuario registre puntos de referencia.
   void _addStopAt(LatLng point) {
     showDialog(
       context: context,
@@ -146,6 +154,8 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
     );
   }
 
+  /// Guarda la ruta y sus paradas después de validar el formulario.
+  /// El proceso crea una nueva ruta o actualiza una existente en el provider.
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -194,6 +204,8 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
     );
   }
 
+  /// Muestra una confirmación antes de eliminar una ruta.
+  /// También informa que las unidades asignadas dejarán de estar relacionadas con ese recorrido.
   void _showDeleteRouteDialog(BuildContext context, DataProvider dataProvider) {
     showDialog(
       context: context,
@@ -229,6 +241,8 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
     );
   }
 
+  /// Abre un diálogo para asignar una unidad disponible a la ruta actual.
+  /// Al asignarla, además crea un viaje inicial para iniciar el seguimiento del recorrido.
   void _showAssignUnitDialog(BuildContext context, DataProvider dataProvider) {
     final allUnits = dataProvider.getUnitsByCooperative(widget.cooperativeId);
     final assignableUnits =
@@ -338,6 +352,9 @@ class _RouteFormScreenState extends State<RouteFormScreen> {
     );
   }
 
+  /// Construye la vista completa del formulario de rutas.
+  /// Organiza los datos generales, el mapa interactivo para agregar paradas,
+  /// la lista de puntos registrados y los botones de acción del formulario.
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context);

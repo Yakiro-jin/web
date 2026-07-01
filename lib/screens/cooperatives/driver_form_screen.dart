@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 import '../../models/driver.dart';
 import '../../providers/data_provider.dart';
 
+/// Formulario para registrar o editar un chofer asociado a una cooperativa.
+/// Recoge información personal, de contacto y de edad, y la envía al provider
+/// para que queden persistidos en la base de datos local o remota del sistema.
 class DriverFormScreen extends StatefulWidget {
   final String cooperativeId;
   final Driver? driver;
@@ -53,6 +56,8 @@ class _DriverFormScreenState extends State<DriverFormScreen> {
     super.dispose();
   }
 
+  /// Guarda los datos del chofer después de validar el formulario.
+  /// Dependiendo del modo de edición, crea un nuevo registro o actualiza uno existente.
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -103,6 +108,9 @@ class _DriverFormScreenState extends State<DriverFormScreen> {
     );
   }
 
+  /// Construye la interfaz del formulario con campos organizados por secciones.
+  /// El diseño separa la información del chofer, aplica validaciones visuales y
+  /// presenta un botón principal para guardar los cambios.
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.driver != null;

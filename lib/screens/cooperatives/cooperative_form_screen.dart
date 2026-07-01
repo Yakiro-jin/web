@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 import '../../models/cooperative.dart';
 import '../../providers/data_provider.dart';
 
+/// Formulario reutilizable para crear o editar una cooperativa.
+/// Permite capturar el RIF, el nombre, la ubicación, el horario y la descripción,
+/// además de validar que los datos ingresados sean coherentes antes de guardar.
 class CooperativeFormScreen extends StatefulWidget {
   final Cooperative?
       cooperative; // Si es null, estamos creando; si tiene valor, estamos editando
@@ -184,7 +187,8 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
   }
 
   /// Ejecuta la lógica de guardado del formulario.
-  /// Combina el prefijo RIF + dígitos, el municipio seleccionado y el horario formateado.
+  /// Combina el prefijo RIF + dígitos, el municipio seleccionado y el horario formateado,
+  /// luego delega el proceso al provider de datos para crear o actualizar la cooperativa.
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -248,6 +252,9 @@ class _CooperativeFormScreenState extends State<CooperativeFormScreen> {
     Navigator.of(context).pop(widget.cooperative == null ? fullRif : null);
   }
 
+  /// Construye el formulario con secciones visuales para los datos de la cooperativa.
+  /// La interfaz está organizada por bloques: información de la empresa, ubicación,
+  /// horario y botones de acción para guardar o cancelar el registro.
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.cooperative != null;

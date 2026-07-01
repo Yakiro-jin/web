@@ -8,6 +8,9 @@ import '../../providers/data_provider.dart';
 import '../../widgets/transport_unit_card.dart';
 import '../units/transport_unit_form_screen.dart';
 
+/// Pantalla de detalle de una ruta de transporte.
+/// Muestra información general de la ruta, un mapa con su recorrido, las paradas
+/// registradas y la lista de unidades asociadas para facilitar su administración.
 class RouteDetailScreen extends StatefulWidget {
   final TransportRoute route;
 
@@ -33,6 +36,8 @@ class _RouteDetailScreenState extends State<RouteDetailScreen>
     super.dispose();
   }
 
+  /// Abre un diálogo para asignar una unidad disponible a la ruta actual.
+  /// Solo muestra aquellas unidades que todavía no pertenecen a esta ruta.
   void _showAssignUnitDialog(BuildContext context, DataProvider dataProvider) {
     final allUnits =
         dataProvider.getUnitsByCooperative(widget.route.cooperativeId);
@@ -116,6 +121,9 @@ class _RouteDetailScreenState extends State<RouteDetailScreen>
     );
   }
 
+  /// Construye la vista principal de la ruta con dos pestañas.
+  /// La primera muestra los detalles y el recorrido en un mapa, mientras que la segunda
+  /// presenta las unidades actualmente asignadas a la ruta.
   @override
   Widget build(BuildContext context) {
     final stops = widget.route.stops;
